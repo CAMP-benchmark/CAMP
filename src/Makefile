@@ -1,6 +1,6 @@
-CPPFLAGS = 
+CPPFLAGS = -I/opt/cray/pe/papi/6.0.0.6/include -DCAMP_HWPC
 CFLAGS = -O2 -march=znver2 -Rpass=loop-vectorize -fopenmp -fno-vectorize #-g
-LDFLAGS = -fopenmp #-fsanitize=address
+LDFLAGS = -fopenmp -L/opt/cray/pe/papi/6.0.0.6/lib64 -lpapi #-fsanitize=address
 
 KERNELSRC = kernel.c
 
@@ -9,7 +9,7 @@ SRC += $(KERNELSRC)
 INC = driver.h util.h
 OBJDIR = build
 
-EXE = build/camp
+EXE = build/camp-hwpc
 ifneq ($(KERNELSRC), kernel.c)
 EXE = build/camp-custom
 endif

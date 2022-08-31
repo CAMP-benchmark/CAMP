@@ -5,6 +5,13 @@
 #include <time.h>
 #include <stdio.h>
 #include "util.h"
+#include <papi.h>
+
+#ifndef CAMP_HWPC
+#define CAMP_HWPC 0
+#else
+#define CAMP_HWPC 1
+#endif
 
 /* STREAM TRAID kernel, 1 operation on 1 element, move 24 byte, do 2 FLOP */
 #define TRAID_BYTEPEROPS 12
@@ -12,20 +19,21 @@
 
 double *a[128], *b[128], *c[128];
 int sizeperarray;
+int nthreads;
 
 /* Preprocess
  * Driver invoke this for each `nthreads`
  * You might want to allocate resource in this routine
  */
 void camp_preprocess(const Parameter *param) {
-    int nthreads = omp_get_num_threads();
+    // nthreads = omp_get_num_threads();
     // a = (double **)malloc(sizeof(double *) * nthreads);
     // b = (double **)malloc(sizeof(double *) * nthreads);
     // c = (double **)malloc(sizeof(double *) * nthreads);
-#pragma omp parallel default(none) shared(param, a, b, c, sizeperarray)
+#pragma omp parallel default(none) shared(param, a, b, c, sizeperarray, nthreads)
     {
         int tid = omp_get_thread_num();
-        int nthreads = omp_get_num_threads();
+        nthreads = omp_get_num_threads();
         if (param->scale == strong) sizeperarray = param->size / nthreads;
         else if (param->scale == weak) sizeperarray = param->size;
         a[tid] = (double *)malloc(sizeof(double) * sizeperarray);
@@ -236,6 +244,22 @@ static double camp_random(const Parameter *param, float intensity) {
  */
 void camp_kernel(const Parameter *param, double intensity, double *runtime, double *mb, double *mflop) {
     double memperarray = param->size * sizeof(double) * 1.0E-06;  /* MB */
+
+#if CAMP_HWPC
+    float real_time, proc_time,mflips;
+    long long flpins;
+    float ireal_time, iproc_time, imflips;
+    long long iflpins;
+    int retval;
+
+    if((retval=PAPI_flips_rate(PAPI_FP_INS,&ireal_time,&iproc_time,&iflpins,&imflips)) < PAPI_OK)
+    { 
+        printf("Could not initialise PAPI_flips \n");
+        printf("Your platform may not support floating point instruction event.\n");    printf("retval: %d\n", retval);
+        exit(1);
+    }
+#endif
+
     if (strcmp(param->kernel, "contig") == 0) {
         *mb = memperarray * 3.0;
         *mflop = *mb * intensity;
@@ -276,17 +300,25 @@ void camp_kernel(const Parameter *param, double intensity, double *runtime, doub
         fprintf(stderr, "Unsupported kernel\n");
         exit(-1);
     }
-    int n;
-#pragma omp parallel default(none) shared(n)
-    {
-    #pragma omp single
-        {    
-            n = omp_get_num_threads();
-        }
+
+#if CAMP_HWPC
+    if((retval=PAPI_flips_rate(PAPI_FP_INS,&real_time, &proc_time, &flpins, &mflips))<PAPI_OK)
+    {    
+        printf("retval: %d\n", retval);
+        exit(1);
     }
+    *mflop = flpins * 1.0E-06;
+    /* TODO: PAPI should apply to each threads, 
+    * now we apply only to master threads
+    * and multiply by the number of threads 
+    */
+    *mflop = *mflop * nthreads;
+#endif
     if (param->scale == weak) {
-        *mb = *mb * n;
-        *mflop = *mb * n;
+        *mb = *mb * nthreads;
+#if !(CAMP_HWPC)
+        *mflop = *mb * nthreads;
+#endif
     }
 }
 

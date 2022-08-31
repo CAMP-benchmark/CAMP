@@ -51,6 +51,9 @@ void loop(const Parameter *param) {
             if (intensity_iter == 0 && runtime < 0.01)
                 printf("Warning: each thread run less than 0.01 second (%.4fs), "
                        "should increase <repeat> to get a resonable runtime\n", runtime);
+            FILE *oi = fopen("intensity.csv", "a");
+            fprintf(oi, "%f,%f\n",intensity, mflop);
+            fclose(oi);
             write_record("%s, %.2f, %d, %.2f, %f, %f, %f\n",
                 param->kernel, mb * 1.0E6 / 1024 / 1024, nthreads, intensity,
                 runtime, mb / runtime, mflop / runtime);
