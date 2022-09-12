@@ -17,7 +17,7 @@ void loop(const Parameter *param) {
     for (size_t threads_iter = 0; threads_iter < param->threads->size; ++threads_iter) {
         int nthreads = (int)param->threads->vals[threads_iter];
         omp_set_num_threads(nthreads);
-#pragma omp parallel default(none) shared(nthreads, param)
+#pragma omp parallel default(none) shared(nthreads, param, stderr)
     {
     #pragma omp single
         {
