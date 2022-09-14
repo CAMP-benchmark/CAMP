@@ -4,28 +4,30 @@ TARGET=$(strip $(ARCH))
 # assumes 
 # PrgEnv-cray
 ifeq ($(TARGET), archer2-cray)
-  CC=cc
-  CPPFLAGS = 
-  CFLAGS = -O2 -march=znver2 -Rpass=loop-vectorize -fopenmp -fno-vectorize #-g
-  LDFLAGS = -fopenmp -fsanitize=address
-endif
+CC=cc
+CPPFLAGS = 
+CFLAGS = -O2 -march=znver2 -Rpass=loop-vectorize -fopenmp -fno-vectorize #-g
+LDFLAGS = -fopenmp -fsanitize=address
 
 # assumes 
 # module load gnuX  
 # where is the version e.g. 10.2.0
-ifeq ($(TARGET), ngio-gnu)
-  CC=gcc
-  CPPFLAGS =
-  CFLAGS = -O2 -fno-tree-vectorize -fopenmp
-  LDFLAGS = -fopenmp -lm
-endif
+else ifeq ($(TARGET), ngio-gnu)
+CC=gcc
+CPPFLAGS =
+CFLAGS = -O2 -fno-tree-vectorize -fopenmp
+LDFLAGS = -fopenmp -lm
 
-# TODO add check for unexpected values
-ifeq ($(TARGET), )
-	CC=echo; \
-	echo ERROR: You must specify ARCH \(for options see \"make usage\"\); \
-	echo; \
-	exit 1
+else ifeq ($(TARGET), )
+arch-missing:
+	@echo ERROR: You must specify ARCH \(for options see \"make usage\"\)
+	@echo
+	@exit 1
+else
+arch-invalid:
+	@echo ERROR: You must provide a valid ARCH \(for options see \"make usage\"\)
+	@echo
+	@exit 1
 endif
 
 KERNELSRC = kernel.c
