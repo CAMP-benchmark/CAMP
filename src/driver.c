@@ -12,7 +12,7 @@
  * 3. loop repeat
  */
 void loop(const Parameter *param) {
-    write_record("kernel,memory(MiB),nthreads,intensity,runtime(s),bandwidth(MB/s),mflops\n");
+    write_record("kernel,memory(MiB),MFLOP,nthreads,intensity,runtime(s),bandwidth(MB/s),mflops,repeat,raw_runtime(colon-seperated)\n");
 
     for (size_t threads_iter = 0; threads_iter < param->threads->size; ++threads_iter) {
         int nthreads = (int)param->threads->vals[threads_iter];
@@ -40,21 +40,28 @@ void loop(const Parameter *param) {
         for (size_t intensity_iter = 0; intensity_iter < param->intensity->size; ++intensity_iter) {
             double intensity = param->intensity->vals[intensity_iter];
             double mb, mflop;
-            double runtime = DBL_MAX, this_runtime;
+            double min_runtime = DBL_MAX, this_runtime;
             verbose("%.2f ", intensity);
 
             /* main */
+            double raw_vals[param->repeat];
             for (int repeat = 0; repeat < param->repeat; ++repeat) {
                 camp_kernel(param, intensity, &this_runtime, &mb, &mflop);
-                runtime = MIN(runtime, this_runtime);
+                raw_vals[repeat] = this_runtime;
+                min_runtime = MIN(min_runtime, this_runtime);
             }
             
-            if (intensity_iter == 0 && runtime < 0.01)
+            if (intensity_iter == 0 && min_runtime < 0.01)
                 printf("Warning: each thread run less than 0.01 second (%.4fs), "
-                       "should increase <repeat> to get a resonable runtime\n", runtime);
-            write_record("%s, %.2f, %d, %.2f, %f, %f, %f\n",
-                param->kernel, mb * 1.0E6 / 1024 / 1024, nthreads, intensity,
-                runtime, mb / runtime, mflop / runtime);
+                       "should increase <repeat> to get a resonable runtime\n", min_runtime);
+            write_record("%s, %.2f, %.2f, %d, %.2f, %f, %f, %f, %d, ",
+                param->kernel, mb * 1.0E6 / 1024 / 1024, mflop, nthreads, intensity,
+                min_runtime, mb / min_runtime, mflop / min_runtime, param->repeat);
+            for (int repeat = 0; repeat < param->repeat; ++repeat) {
+                if (repeat > 0) write_record(":");
+                write_record("%f", raw_vals[repeat]);
+            }
+            write_record("\n");
         }  /* for intensity */
         
         camp_postprocess(param);
