@@ -1,0 +1,32 @@
+CrayPat/X:  Version 21.02.0 Revision ee5549f05  01/13/21 04:13:58
+Array size is: 2048000000
+Number of trails is: 5
+Time {min, avg, max}: {0.2151, 0.2152, 0.2153}
+Traffic is 4.000000 Bytes per iteration
+Bandwidth {max, avg, min} is {304746407044.8752, 304567311178.0201, 304344208906.0775}
+Experiment data directory written:
+/mnt/lustre/a2fs-work3/work/ta094/ta094/wenqingpeng/CAMP/hwpc/kernel_hwpc_ADD+pat+14424-1246t
+CrayPat/X:  Version 21.02.0 Revision ee5549f05  01/13/21 04:13:58
+Array size is: 2048000000
+Number of trails is: 5
+Time {min, avg, max}: {0.3116, 0.3118, 0.3122}
+Traffic is 6.000000 Bytes per iteration
+Bandwidth {max, avg, min} is {315528977596.2925, 315246286825.8436, 314896412569.9858}
+Experiment data directory written:
+/mnt/lustre/a2fs-work3/work/ta094/ta094/wenqingpeng/CAMP/hwpc/kernel_hwpc_TMP+pat+14461-1246t
+CrayPat/X:  Version 21.02.0 Revision ee5549f05  01/13/21 04:13:58
+Array size is: 2048000000
+Number of trails is: 5
+Time {min, avg, max}: {0.3105, 0.3109, 0.3114}
+Traffic is 6.000000 Bytes per iteration
+Bandwidth {max, avg, min} is {316616390287.6537, 316199052021.3979, 315701233440.1452}
+Experiment data directory written:
+/mnt/lustre/a2fs-work3/work/ta094/ta094/wenqingpeng/CAMP/hwpc/kernel_hwpc_NOTMP+pat+14496-1246t
+CrayPat/X:  Version 21.02.0 Revision ee5549f05  01/13/21 04:13:58
+Array size is: 2048000000
+Number of trails is: 5
+Time {min, avg, max}: {0.4249, 0.4250, 0.4251}
+Traffic is 8.000000 Bytes per iteration
+Bandwidth {max, avg, min} is {308488327165.3154, 308403114195.0660, 308358207703.6293}
+Experiment data directory written:
+/mnt/lustre/a2fs-work3/work/ta094/ta094/wenqingpeng/CAMP/hwpc/kernel_hwpc_MORE+pat+14533-1246t

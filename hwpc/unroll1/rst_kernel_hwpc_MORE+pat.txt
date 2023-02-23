@@ -1,0 +1,496 @@
+CrayPat/X:  Version 21.02.0 Revision ee5549f05  01/13/21 04:13:58
+
+Number of PEs (MPI ranks):    1
+                           
+Numbers of PEs per Node:      1
+                           
+Numbers of Threads per PE:   16
+                           
+Number of Cores per Socket:  64
+
+Execution start time:  Thu Feb 23 18:15:25 2023
+
+System name and speed:  nid001246  2.000 GHz (nominal)
+
+AMD   Rome                 CPU  Family: 23  Model: 49  Stepping:  0
+
+Core Performance Boost:  16 PEs have CPB capability
+
+
+Current path to data file:
+  /work/ta094/ta094/wenqingpeng/CAMP/hwpc/kernel_hwpc_MORE+pat+33969-1246t
+
+
+Notes for table 1:
+
+  This table shows functions that have significant exclusive time,
+    averaged across ranks.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O profile ...
+
+Table 1:  Profile by Function Group and Function
+
+  Time% |     Time |     Imb. |  Imb. | Calls | Group
+        |          |     Time | Time% |       |  Function
+        |          |          |       |       |   Thread=HIDE
+       
+ 100.0% | 3.449710 |       -- |    -- |  34.0 | Total
+|----------------------------------------------------------------------
+|  77.9% | 2.686778 |       -- |    -- |  13.0 | USER
+||---------------------------------------------------------------------
+||  61.0% | 2.102784 | 0.019329 |  1.0% |   5.0 | main.LOOP@li.78
+||  16.6% | 0.574026 | 0.005154 |  0.9% |   1.0 | main.LOOP@li.64
+||=====================================================================
+|  22.1% | 0.762143 |       -- |    -- |   6.0 | OMP
+||---------------------------------------------------------------------
+||  21.4% | 0.738607 |       -- |    -- |   1.0 | main.REGION@li.64(ovhd)
+|======================================================================
+
+Notes for table 2:
+
+  This table shows functions that have the most significant exclusive
+    time, taking the maximum time across ranks and threads.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O profile_max ...
+
+Table 2:  Profile of maximum function times
+
+  Time% |     Time |     Imb. |  Imb. | Function
+        |          |     Time | Time% |  Thread=HIDE
+|--------------------------------------------------------------
+| 100.0% | 2.126256 | 0.019329 |  1.0% | main.LOOP@li.78
+|  34.7% | 0.738607 |       -- |    -- | main.REGION@li.64(ovhd)
+|  27.2% | 0.578926 | 0.005154 |  0.9% | main.LOOP@li.64
+|   1.1% | 0.023537 |       -- |    -- | main.REGION@li.78(ovhd)
+|==============================================================
+
+Notes for table 3:
+
+  This table shows functions that have the most significant exclusive
+    time, taking for each thread the average time across ranks.
+    The imbalance percentage is relative to the team observed to
+    participate in execution.
+    Use -s th=ALL to see individual thread values.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O profile_th_pe ...
+
+Table 3:  Profile by Function Group and Function
+
+  Time% |     Time |     Imb. |  Imb. | Team | Calls | Group
+        |          |     Time | Time% | Size |       |  Function
+        |          |          |       |      |       |   Thread=HIDE
+        |          |          |       |      |       |    PE=HIDE
+       
+ 100.0% | 3.449710 |       -- |    -- |   -- |  34.0 | Total
+|-----------------------------------------------------------------------------
+|  77.9% | 2.686778 |       -- |    -- |   -- |  13.0 | USER
+||----------------------------------------------------------------------------
+||  61.0% | 2.102784 | 0.019329 |  1.0% |   16 |   5.0 | main.LOOP@li.78
+||  16.6% | 0.574026 | 0.005154 |  0.9% |   16 |   1.0 | main.LOOP@li.64
+||============================================================================
+|  22.1% | 0.762143 |       -- |    -- |   -- |   6.0 | OMP
+||----------------------------------------------------------------------------
+||  21.4% | 0.738607 |       -- |    -- |    1 |   1.0 | main.REGION@li.64(ovhd)
+|=============================================================================
+
+Notes for table 4:
+
+  This table shows the time in each thread, and the imbalance of time
+    across threads, taking for each thread the maximum time across
+    ranks.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O load_imbalance_thread ...
+
+Table 4:  Load Imbalance by Thread
+
+     Max. |     Imb. |  Imb. | Thread
+     Time |     Time | Time% |  PE=HIDE
+         
+ 3.449750 | 0.720670 | 22.3% | Total
+|---------------------------------------
+| 3.449750 |       -- |    -- | thread.0
+| 2.704920 |       -- |    -- | thread.7
+| 2.699824 |       -- |    -- | thread.6
+| 2.695194 |       -- |    -- | thread.14
+| 2.694992 |       -- |    -- | thread.9
+| 2.694904 |       -- |    -- | thread.15
+| 2.691116 |       -- |    -- | thread.1
+| 2.686340 |       -- |    -- | thread.8
+| 2.684928 |       -- |    -- | thread.13
+| 2.682864 |       -- |    -- | thread.5
+| 2.682223 |       -- |    -- | thread.2
+| 2.669002 |       -- |    -- | thread.12
+| 2.663078 |       -- |    -- | thread.4
+| 2.662364 |       -- |    -- | thread.3
+| 2.661197 |       -- |    -- | thread.11
+| 2.642596 |       -- |    -- | thread.10
+|=======================================
+
+Notes for table 5:
+
+  This table shows functions that have significant exclusive time,
+    averaged across ranks.
+    Processor HW counter data is also shown, if available.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O profile+hwpc ...
+
+Table 5:  Profile by Function Group and Function
+
+Group / Function / Thread=HIDE
+
+  
+==============================================================================
+  Total
+------------------------------------------------------------------------------
+  Time%                                               100.0% 
+  Time                                              3.449710 secs
+  Imb. Time                                               -- secs
+  Imb. Time%                                              -- 
+  Calls                           9.856 /sec            34.0 calls
+  PAPI_L2_DCM                     0.005G/sec  16,627,741.000 misses
+  CORE_TO_L2_CACHEABLE_REQUEST_ACCESS_STATUS:
+    LS_RD_BLK_C                   0.005G/sec      16,627,741 req
+  L2_PREFETCH_HIT_L2              0.002G/sec       6,247,245 hits
+  L2_PREFETCH_HIT_L3              0.017G/sec      57,650,289 hits
+  REQUESTS_TO_L2_GROUP1:L2_HW_PF  0.109G/sec     377,138,563 ops
+  REQUESTS_TO_L2_GROUP1:RD_BLK_X  0.005G/sec      17,923,105 ops
+  Cache Lines PF from OffCore     0.108G/sec     370,891,318 lines
+  Cache Lines PF from Memory      0.091G/sec     313,241,029 lines
+  Cache Lines Requested from 
+    Memory                        0.004G/sec      14,043,172 lines
+  Write Memory Traffic GBytes     0.276G/sec            0.95 GB
+  Read Memory Traffic GBytes      6.072G/sec           20.95 GB
+  Memory traffic GBytes           6.348G/sec           21.90 GB
+  Memory Traffic / Nominal Peak                         3.1% 
+  Average Time per Call                             0.101462 secs
+  CrayPat Overhead : Time          0.0%                      
+==============================================================================
+  USER
+------------------------------------------------------------------------------
+  Time%                                                77.9% 
+  Time                                              2.686778 secs
+  Imb. Time                                               -- secs
+  Imb. Time%                                              -- 
+  Calls                           4.839 /sec            13.0 calls
+  PAPI_L2_DCM                     0.006G/sec  16,623,924.000 misses
+  CORE_TO_L2_CACHEABLE_REQUEST_ACCESS_STATUS:
+    LS_RD_BLK_C                   0.006G/sec      16,623,924 req
+  L2_PREFETCH_HIT_L2              0.002G/sec       6,245,282 hits
+  L2_PREFETCH_HIT_L3              0.021G/sec      57,649,825 hits
+  REQUESTS_TO_L2_GROUP1:L2_HW_PF  0.140G/sec     377,135,085 ops
+  REQUESTS_TO_L2_GROUP1:RD_BLK_X  0.007G/sec      17,919,698 ops
+  Cache Lines PF from OffCore     0.138G/sec     370,889,803 lines
+  Cache Lines PF from Memory      0.117G/sec     313,239,978 lines
+  Cache Lines Requested from 
+    Memory                        0.005G/sec      14,039,959 lines
+  Write Memory Traffic GBytes     0.355G/sec            0.95 GB
+  Read Memory Traffic GBytes      7.796G/sec           20.95 GB
+  Memory traffic GBytes           8.150G/sec           21.90 GB
+  Memory Traffic / Nominal Peak                         4.0% 
+  Average Time per Call                             0.206675 secs
+  CrayPat Overhead : Time          0.0%                      
+==============================================================================
+  USER / main.LOOP@li.78
+------------------------------------------------------------------------------
+  Time%                                                61.0% 
+  Time                                              2.102784 secs
+  Imb. Time                                         0.019329 secs
+  Imb. Time%                                            1.0% 
+  Calls                           2.378 /sec             5.0 calls
+  PAPI_L2_DCM                     0.007G/sec  13,690,786.000 misses
+  CORE_TO_L2_CACHEABLE_REQUEST_ACCESS_STATUS:
+    LS_RD_BLK_C                   0.007G/sec      13,690,786 req
+  L2_PREFETCH_HIT_L2              0.002G/sec       4,167,876 hits
+  L2_PREFETCH_HIT_L3              0.081M/sec         169,823 hits
+  REQUESTS_TO_L2_GROUP1:L2_HW_PF  0.150G/sec     314,379,328 ops
+  REQUESTS_TO_L2_GROUP1:RD_BLK_X  0.008G/sec      17,243,794 ops
+  Cache Lines PF from OffCore     0.148G/sec     310,211,452 lines
+  Cache Lines PF from Memory      0.147G/sec     310,041,629 lines
+  Cache Lines Requested from 
+    Memory                        0.007G/sec      13,683,291 lines
+  Write Memory Traffic GBytes     0.518G/sec            1.09 GB
+  Read Memory Traffic GBytes      9.853G/sec           20.72 GB
+  Memory traffic GBytes          10.370G/sec           21.81 GB
+  Memory Traffic / Nominal Peak                         5.1% 
+  Average Time per Call                             0.420557 secs
+  CrayPat Overhead : Time          0.0%                      
+==============================================================================
+  USER / main.LOOP@li.64
+------------------------------------------------------------------------------
+  Time%                                                16.6% 
+  Time                                              0.574026 secs
+  Imb. Time                                         0.005154 secs
+  Imb. Time%                                            0.9% 
+  Calls                           1.742 /sec             1.0 calls
+  PAPI_L2_DCM                     0.005G/sec   2,919,883.000 misses
+  CORE_TO_L2_CACHEABLE_REQUEST_ACCESS_STATUS:
+    LS_RD_BLK_C                   0.005G/sec       2,919,883 req
+  L2_PREFETCH_HIT_L2              0.004G/sec       2,066,323 hits
+  L2_PREFETCH_HIT_L3              0.100G/sec      57,477,100 hits
+  REQUESTS_TO_L2_GROUP1:L2_HW_PF  0.109G/sec      62,740,515 ops
+  REQUESTS_TO_L2_GROUP1:RD_BLK_X  0.001G/sec         662,430 ops
+  Cache Lines PF from OffCore     0.106G/sec      60,674,192 lines
+  Cache Lines PF from Memory      0.006G/sec       3,197,092 lines
+  Cache Lines Requested from 
+    Memory                        0.268M/sec         153,857 lines
+  Write Memory Traffic GBytes     0.004G/sec            0.00 GB
+  Read Memory Traffic GBytes      0.374G/sec            0.21 GB
+  Memory traffic GBytes           0.377G/sec            0.22 GB
+  Memory Traffic / Nominal Peak                         0.2% 
+  Average Time per Call                             0.574026 secs
+  CrayPat Overhead : Time          0.0%                      
+==============================================================================
+==============================================================================
+  OMP
+------------------------------------------------------------------------------
+  Time%                                                22.1% 
+  Time                                              0.762143 secs
+  Imb. Time                                               -- secs
+  Imb. Time%                                              -- 
+  Calls                           7.873 /sec             6.0 calls
+  PAPI_L2_DCM                     0.004M/sec       3,083.000 misses
+  CORE_TO_L2_CACHEABLE_REQUEST_ACCESS_STATUS:
+    LS_RD_BLK_C                   0.004M/sec           3,083 req
+  L2_PREFETCH_HIT_L2              0.001M/sec             885 hits
+  L2_PREFETCH_HIT_L3            304.405 /sec             232 hits
+  REQUESTS_TO_L2_GROUP1:L2_HW_PF  0.003M/sec           2,069 ops
+  REQUESTS_TO_L2_GROUP1:RD_BLK_X  0.002M/sec           1,520 ops
+  Cache Lines PF from OffCore     0.002M/sec           1,184 lines
+  Cache Lines PF from Memory      0.001M/sec             952 lines
+  Cache Lines Requested from 
+    Memory                        0.003M/sec           2,479 lines
+  Write Memory Traffic GBytes     0.059M/sec            0.00 GB
+  Read Memory Traffic GBytes      0.288M/sec            0.00 GB
+  Memory traffic GBytes           0.347M/sec            0.00 GB
+  Memory Traffic / Nominal Peak                         0.0% 
+  Average Time per Call                             0.127024 secs
+  CrayPat Overhead : Time          0.0%                      
+==============================================================================
+  OMP / main.REGION@li.64(ovhd)
+------------------------------------------------------------------------------
+  Time%                                                21.4% 
+  Time                                              0.738607 secs
+  Imb. Time                                               -- secs
+  Imb. Time%                                              -- 
+  Calls                           1.354 /sec             1.0 calls
+  PAPI_L2_DCM                     0.003M/sec       2,140.000 misses
+  CORE_TO_L2_CACHEABLE_REQUEST_ACCESS_STATUS:
+    LS_RD_BLK_C                   0.003M/sec           2,140 req
+  L2_PREFETCH_HIT_L2            774.431 /sec             572 hits
+  L2_PREFETCH_HIT_L3            314.105 /sec             232 hits
+  REQUESTS_TO_L2_GROUP1:L2_HW_PF  0.002M/sec           1,446 ops
+  REQUESTS_TO_L2_GROUP1:RD_BLK_X  0.002M/sec           1,127 ops
+  Cache Lines PF from OffCore     0.001M/sec             874 lines
+  Cache Lines PF from Memory    869.204 /sec             642 lines
+  Cache Lines Requested from 
+    Memory                        0.002M/sec           1,572 lines
+  Write Memory Traffic GBytes     0.043M/sec            0.00 GB
+  Read Memory Traffic GBytes      0.192M/sec            0.00 GB
+  Memory traffic GBytes           0.235M/sec            0.00 GB
+  Memory Traffic / Nominal Peak                         0.0% 
+  Average Time per Call                             0.738607 secs
+  CrayPat Overhead : Time          0.0%                      
+==============================================================================
+
+Notes for table 6:
+
+  This table shows energy and power usage for the nodes with the
+    maximum, mean, and minimum usage, as well as the sum of usage over
+    all nodes.
+    Energy and power for accelerators is also shown, if applicable.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O program_energy ...
+
+Table 6:  Program energy and power usage (from Cray PM)
+
+   Node |     Node |  Process | Thread=HIDE
+ Energy |    Power |     Time | 
+    (J) |      (W) |          | 
+-------------------------------------------
+  1,139 |  297.848 | 3.824094 | Total
+===========================================
+
+Notes for table 7:
+
+  This table shows values shown for HiMem calculated from information
+    in the /proc/self/numa_maps files captured near the end of the
+    program. It is the total size of all pages, including huge pages,
+    that were actually mapped into physical memory from both private
+    and shared memory segments.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O himem ...
+
+Table 7:  Memory High Water Mark by Numa Node
+
+Numanode
+
+  
+==============================================================================
+  numanode.5
+------------------------------------------------------------------------------
+  Process HiMem (MiBytes)         62,737.5 
+  HiMem Numa Node 0 (MiBytes)      8,013.0 MiBytes
+  HiMem Numa Node 1 (MiBytes)      7,813.4 MiBytes
+  HiMem Numa Node 2 (MiBytes)      7,817.4 MiBytes
+  HiMem Numa Node 3 (MiBytes)      7,813.4 MiBytes
+  HiMem Numa Node 4 (MiBytes)      7,813.4 MiBytes
+  HiMem Numa Node 5 (MiBytes)      7,835.3 MiBytes
+  HiMem Numa Node 6 (MiBytes)      7,813.4 MiBytes
+  HiMem Numa Node 7 (MiBytes)      7,818.2 MiBytes
+==============================================================================
+
+Notes for table 8:
+
+  This table shows memory traffic for numa nodes, taking for each numa
+    node the maximum value across nodes. It also shows the balance in
+    memory traffic by showing the top 3 and bottom 3 node values.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O mem_bw ...
+
+Table 8:  Memory Bandwidth by Numanode
+
+  Memory |    Read |   Write |   Thread |  Memory |  Memory | Numanode
+ Traffic |  Memory |  Memory |     Time | Traffic | Traffic |  Thread=HIDE
+  GBytes | Traffic | Traffic |          |  GBytes |       / | 
+         |  GBytes |  GBytes |          |   / Sec | Nominal | 
+         |         |         |          |         |    Peak | 
+|-------------------------------------------------------------------------
+|  328.92 |  314.47 |   14.45 | 3.020866 |  108.88 |   53.2% | numanode.0
+|   21.90 |   20.95 |    0.95 | 3.788413 |    5.78 |    2.8% | numanode.5
+|=========================================================================
+
+Notes for table 9:
+
+  This table shows total wall clock time for the ranks with the
+    maximum, mean, and minimum time, as well as the average across
+    ranks.
+    It also shows maximum memory usage from /proc/self/numa_maps for
+    those ranks, and on average.  The usage is total size of all
+    pages, including huge pages, that were actually mapped into
+    physical memory from both private and shared memory segments.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O program_time ...
+
+Table 9:  Wall Clock Time, Memory High Water Mark
+
+  Process |   Process | Thread
+     Time |     HiMem | 
+          | (MiBytes) | 
+         
+ 3.824094 |  62,737.5 | Total
+|-------------------------------
+| 3.824094 |  62,737.5 | thread.0
+|===============================
+
+========================  Additional details  ========================
+
+
+
+General table notes:
+
+    The default notes for a table are based on the default definition of
+    the table, and do not account for the effects of command-line options
+    that may modify the content of the table.
+    
+    Detailed notes, produced by the pat_report -v option, do account for
+    all command-line options, and also show how data is aggregated, and
+    if the table content is limited by thresholds, rank selections, etc.
+    
+    An imbalance metric in a line is based on values in main threads
+    across multiple ranks, or on values across all threads, as applicable.
+    
+    An imbalance percent in a line is relative to the maximum value
+    for that line across ranks or threads, as applicable.
+    
+Experiment:  trace
+
+Original path to data file:
+  /mnt/lustre/a2fs-work3/work/ta094/ta094/wenqingpeng/CAMP/hwpc/kernel_hwpc_MORE+pat+33969-1246t/xf-files
+
+Original program:
+  /mnt/lustre/a2fs-work3/work/ta094/ta094/wenqingpeng/CAMP/hwpc/kernel_hwpc_MORE
+
+Instrumented with:  pat_build -w kernel_hwpc_MORE
+
+Instrumented program:
+  /mnt/lustre/a2fs-work3/work/ta094/ta094/wenqingpeng/CAMP/hwpc/kernel_hwpc_MORE+pat
+
+Program invocation:  kernel_hwpc_MORE+pat
+
+Exit Status:  0 for 1 PE
+
+Thread start functions and creator functions:
+     1 thread:  main
+    15 threads:  _thread_pool_slave_entry(void*) <- _cray$mt_start_two_code_parallel
+
+Memory pagesize:  4 KiB
+
+Memory hugepagesize:  Not Available
+
+Programming environment:  CRAY
+
+Runtime environment variables:
+  CRAYPAT_COMPILER_OPTIONS=1
+  CRAYPAT_LD_LIBRARY_PATH=/opt/cray/pe/gcc-libs:/opt/cray/gcc-libs:/opt/cray/pe/perftools/21.02.0/lib64
+  CRAYPAT_OPTS_EXECUTABLE=libexec64/opts
+  CRAYPAT_ROOT=/opt/cray/pe/perftools/21.02.0
+  CRAYPE_VERSION=2.7.6
+  CRAY_BINUTILS_VERSION=/opt/cray/pe/cce/11.0.4
+  CRAY_CC_VERSION=11.0.4
+  CRAY_FTN_VERSION=11.0.4
+  CRAY_LIBSCI_VERSION=21.04.1.1
+  CRAY_MPICH_VERSION=8.1.4
+  CRAY_PERFTOOLS_VERSION=21.02.0
+  LIBSCI_VERSION=21.04.1.1
+  LMOD_FAMILY_COMPILER_VERSION=11.0.4
+  LMOD_FAMILY_CRAYPE_CPU_VERSION=false
+  LMOD_FAMILY_CRAYPE_NETWORK_VERSION=false
+  LMOD_FAMILY_CRAYPE_VERSION=2.7.6
+  LMOD_FAMILY_PERFTOOLS_VERSION=false
+  LMOD_FAMILY_PRGENV_VERSION=8.0.0
+  LMOD_VERSION=8.3.1
+  MPICH_DIR=/opt/cray/pe/mpich/8.1.4/ofi/crayclang/9.1
+  OMP_NUM_THREADS=16
+  OMP_PROC_BIND=SPREAD
+  PAT_BUILD_PAPI_LIBDIR=/opt/cray/pe/papi/6.0.0.6/lib64
+  PAT_RT_PERFCTR=CORE_TO_L2_CACHEABLE_REQUEST_ACCESS_STATUS:LS_RD_BLK_C,PAPI_L2_DCM,PAPI_FP_OPS,mem_bw
+  PAT_RT_SUMMARY=0
+  PERFTOOLS_VERSION=21.02.0
+  PMI_CONTROL_PORT=27904
+
+Report time environment variables:
+    CRAYPAT_ROOT=/opt/cray/pe/perftools/21.02.0
+
+Number of MPI control variables collected:  102
+
+  (To see the list, specify: -s mpi_cvar=show)
+
+Report command line options:  <none>
+
+Operating system:
+  Linux 4.12.14-197.78_9.1.64-cray_shasta_c #1 SMP Wed Aug 25 14:56:40 UTC 2021 (4e2a900)
+
+Hardware performance counter events:
+   PAPI_L2_DCM                                             Level 2 data cache misses
+   PAPI_FP_OPS                                             Floating point operations
+   CORE_TO_L2_CACHEABLE_REQUEST_ACCESS_STATUS:LS_RD_BLK_C  L2 cache request outcomes. This event does not count accesses to the L2 cache by the L2 prefetcher.:Number of data cache fill requests missing in the L2 (all types).
+   L2_PREFETCH_HIT_L2                                      Number of L2 prefetcher hits in the L2
+   L2_PREFETCH_HIT_L3                                      Number of L2 prefetcher hits in the L3
+   REQUESTS_TO_L2_GROUP1:L2_HW_PF                          TBD:Number of prefetches accepted by L2 pipeline, hit or miss.
+   REQUESTS_TO_L2_GROUP1:RD_BLK_X                          TBD:Number of data cache stores
+
+Estimated minimum instrumentation overhead per call of a traced function,
+  which was subtracted from the data shown in this report
+  (for raw data, use the option:  -s overhead=include):
+    Time  1.911  microsecs
+
+Number of traced functions that were called:  6
+
+  (To see the list, specify:  -s traced_functions=show)
+
+
+Warnings:
+Inline regions included 14 regions with an invalid address range, and they were ignored.
+
+Invalid address ranges indicate a problem with data collection.
+

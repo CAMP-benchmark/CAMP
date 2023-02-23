@@ -1,0 +1,93 @@
+compile detail:
+
+ $ make hwpc
+cc simple_kernel.c -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize -mllvm -force-vector-interleave=1 -c -DMORE   -o kernel_hwpc.o 
+simple_kernel.c:64:1: remark: vectorized loop (vectorization width: 4, interleaved count: 1) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+simple_kernel.c:78:1: remark: vectorized loop (vectorization width: 4, interleaved count: 1) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+cc kernel_hwpc.o -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize -mllvm -force-vector-interleave=1 -o kernel_hwpc_MORE   
+pat_build -w kernel_hwpc_MORE  
+ $ make hwpc
+cc simple_kernel.c -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize -mllvm -force-vector-interleave=1 -c -DADD   -o kernel_hwpc.o 
+simple_kernel.c:64:1: remark: vectorized loop (vectorization width: 4, interleaved count: 1) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+simple_kernel.c:78:1: remark: vectorized loop (vectorization width: 4, interleaved count: 1) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+cc kernel_hwpc.o -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize -mllvm -force-vector-interleave=1 -o kernel_hwpc_ADD   
+pat_build -w kernel_hwpc_ADD  
+ $ module list
+
+Currently Loaded Modules:
+  1) cce/11.0.4     3) craype-x86-rome         5) craype-network-ofi                          7) cray-mpich/8.1.4        9) PrgEnv-cray/8.0.0  11) epcc-setup-env    13) perftools-base/21.02.0
+  2) craype/2.7.6   4) libfabric/1.11.0.4.71   6) xpmem/2.2.40-7.0.1.0_2.7__g1d7a24d.shasta   8) cray-libsci/21.04.1.1  10) bolt/0.8           12) load-epcc-module  14) perftools
+
+ 
+
+ $ make hwpc
+cc simple_kernel.c -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize -mllvm -force-vector-interleave=1 -c -DTMP   -o kernel_hwpc.o 
+simple_kernel.c:64:1: remark: vectorized loop (vectorization width: 4, interleaved count: 1) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+simple_kernel.c:78:1: remark: vectorized loop (vectorization width: 4, interleaved count: 1) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+cc kernel_hwpc.o -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize -mllvm -force-vector-interleave=1 -o kernel_hwpc_TMP   
+pat_build -w kernel_hwpc_TMP  
+ $ make hwpc
+cc simple_kernel.c -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize -mllvm -force-vector-interleave=1 -c -DNOTMP   -o kernel_hwpc.o 
+simple_kernel.c:64:1: remark: vectorized loop (vectorization width: 4, interleaved count: 1) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+simple_kernel.c:78:1: remark: vectorized loop (vectorization width: 4, interleaved count: 1) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+cc kernel_hwpc.o -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize -mllvm -force-vector-interleave=1 -o kernel_hwpc_NOTMP   
+pat_build -w kernel_hwpc_NOTMP  
+ $ sbatch hwpc.slurm
+Submitted batch job 3151102
+ $ 
+
+===========================
+CrayPat/X:  Version 21.02.0 Revision ee5549f05  01/13/21 04:13:58
+Array size is: 2048000000
+Number of trails is: 5
+Time {min, avg, max}: {0.2055, 0.2058, 0.2061}
+Traffic is 4.000000 Bytes per iteration
+Bandwidth {max, avg, min} is {318934571902.9590, 318515705214.9928, 317995561059.1295}
+Experiment data directory written:
+/mnt/lustre/a2fs-work3/work/ta094/ta094/wenqingpeng/CAMP/hwpc/kernel_hwpc_ADD+pat+33859-1246t
+srun: Job 3151102 step creation temporarily disabled, retrying (Requested nodes are busy)
+srun: Step created for job 3151102
+CrayPat/X:  Version 21.02.0 Revision ee5549f05  01/13/21 04:13:58
+Array size is: 2048000000
+Number of trails is: 5
+Time {min, avg, max}: {0.3114, 0.3115, 0.3117}
+Traffic is 6.000000 Bytes per iteration
+Bandwidth {max, avg, min} is {315703408979.6068, 315567084779.9103, 315427596465.0297}
+Experiment data directory written:
+/mnt/lustre/a2fs-work3/work/ta094/ta094/wenqingpeng/CAMP/hwpc/kernel_hwpc_TMP+pat+33894-1246t
+srun: Job 3151102 step creation temporarily disabled, retrying (Requested nodes are busy)
+srun: Step created for job 3151102
+CrayPat/X:  Version 21.02.0 Revision ee5549f05  01/13/21 04:13:58
+Array size is: 2048000000
+Number of trails is: 5
+Time {min, avg, max}: {0.3115, 0.3117, 0.3118}
+Traffic is 6.000000 Bytes per iteration
+Bandwidth {max, avg, min} is {315599983172.7715, 315396760561.7642, 315302167195.8449}
+Experiment data directory written:
+/mnt/lustre/a2fs-work3/work/ta094/ta094/wenqingpeng/CAMP/hwpc/kernel_hwpc_NOTMP+pat+33934-1246t
+srun: Job 3151102 step creation temporarily disabled, retrying (Requested nodes are busy)
+srun: Step created for job 3151102
+CrayPat/X:  Version 21.02.0 Revision ee5549f05  01/13/21 04:13:58
+Array size is: 2048000000
+Number of trails is: 5
+Time {min, avg, max}: {0.4252, 0.4253, 0.4254}
+Traffic is 8.000000 Bytes per iteration
+Bandwidth {max, avg, min} is {308275555836.6782, 308201656264.6321, 308142161410.4158}
+Experiment data directory written:
+/mnt/lustre/a2fs-work3/work/ta094/ta094/wenqingpeng/CAMP/hwpc/kernel_hwpc_MORE+pat+33969-1246t

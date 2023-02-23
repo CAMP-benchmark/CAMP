@@ -1,0 +1,55 @@
+add
+Array size is: 2048000000
+Number of trails is: 5
+Time {min, avg, max}: {0.2150, 0.2152, 0.2155}
+Traffic is 4.000000 Bytes per iteration
+Bandwidth {max, avg, min} is {304834276089.6012, 304496055571.8395, 304142498112.3725}
+temp
+Array size is: 2048000000
+Number of trails is: 5
+Time {min, avg, max}: {0.3149, 0.3155, 0.3160}
+Traffic is 6.000000 Bytes per iteration
+Bandwidth {max, avg, min} is {312129761651.0179, 311540537387.3403, 311125946462.5679}
+notemp
+srun: Job 3150246 step creation temporarily disabled, retrying (Requested nodes are busy)
+srun: Step created for job 3150246
+Array size is: 2048000000
+Number of trails is: 5
+Time {min, avg, max}: {0.3115, 0.3121, 0.3124}
+Traffic is 6.000000 Bytes per iteration
+Bandwidth {max, avg, min} is {315619068350.2057, 315008667094.9122, 314686601154.2870}
+more
+Array size is: 2048000000
+Number of trails is: 5
+Time {min, avg, max}: {0.4241, 0.4242, 0.4244}
+Traffic is 8.000000 Bytes per iteration
+Bandwidth {max, avg, min} is {309033007517.3346, 308970447668.8560, 308842905473.4418}
+
+cc simple_kernel.c -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize -mllvm -force-vector-interleave=4 -o kernel_ADD -DADD
+simple_kernel.c:64:1: remark: vectorized loop (vectorization width: 4, interleaved count: 4) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+simple_kernel.c:78:1: remark: vectorized loop (vectorization width: 4, interleaved count: 4) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+cc simple_kernel.c -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize -mllvm -force-vector-interleave=4 -o kernel_TMP -DTMP
+simple_kernel.c:64:1: remark: vectorized loop (vectorization width: 4, interleaved count: 4) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+simple_kernel.c:78:1: remark: vectorized loop (vectorization width: 4, interleaved count: 4) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+cc simple_kernel.c -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize -mllvm -force-vector-interleave=4 -o kernel_NOTMP -DNOTMP
+simple_kernel.c:64:1: remark: vectorized loop (vectorization width: 4, interleaved count: 4) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+simple_kernel.c:78:1: remark: vectorized loop (vectorization width: 4, interleaved count: 4) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+cc simple_kernel.c -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize -mllvm -force-vector-interleave=4 -o kernel_MORE -DMORE
+simple_kernel.c:64:1: remark: vectorized loop (vectorization width: 4, interleaved count: 4) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
+simple_kernel.c:78:1: remark: vectorized loop (vectorization width: 4, interleaved count: 4) [-Rpass=loop-vectorize]
+#pragma omp parallel for 
+^
