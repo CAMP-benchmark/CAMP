@@ -25,6 +25,7 @@ Time {min, avg, max}: {0.4241, 0.4242, 0.4244}
 Traffic is 8.000000 Bytes per iteration
 Bandwidth {max, avg, min} is {309033007517.3346, 308970447668.8560, 308842905473.4418}
 
+--------------------
 cc simple_kernel.c -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize -mllvm -force-vector-interleave=4 -o kernel_ADD -DADD
 simple_kernel.c:64:1: remark: vectorized loop (vectorization width: 4, interleaved count: 4) [-Rpass=loop-vectorize]
 #pragma omp parallel for 
