@@ -12,7 +12,7 @@
  * 3. loop repeat
  */
 void loop(const Parameter *param) {
-    write_record("kernel,memory(MiB),MFLOP,nthreads,intensity,runtime(s),bandwidth(MB/s),mflops,repeat,raw_runtime(colon-seperated)\n");
+    write_record("kernel, memory(MiB),     MFLOP, nthreads, intensity, runtime(s), bandwidth(MB/s),          mflops, repeat, raw_runtime(colon-seperated)\n");
 
     for (size_t threads_iter = 0; threads_iter < param->threads->size; ++threads_iter) {
         int nthreads = (int)param->threads->vals[threads_iter];
@@ -54,12 +54,12 @@ void loop(const Parameter *param) {
             if (intensity_iter == 0 && min_runtime < 0.01)
                 printf("Warning: each thread run less than 0.01 second (%.4fs), "
                        "should increase <repeat> to get a resonable runtime\n", min_runtime);
-            write_record("%s, %.2f, %.2f, %d, %.2f, %f, %f, %f, %d, ",
+            write_record("%s, %11.2f, %9.2f,       %d, %9.2f, %10.6f, %15.4f, %15.4f,      %d, ",
                 param->kernel, mb * 1.0E6 / 1024 / 1024, mflop, nthreads, intensity,
                 min_runtime, mb / min_runtime, mflop / min_runtime, param->repeat);
             for (int repeat = 0; repeat < param->repeat; ++repeat) {
                 if (repeat > 0) write_record(":");
-                write_record("%f", raw_vals[repeat]);
+                write_record("%.6f", raw_vals[repeat]);
             }
             write_record("\n");
         }  /* for intensity */
