@@ -1,4 +1,4 @@
-CFLAGS = -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize -mllvm -force-vector-interleave=1
+CFLAGS = -fopenmp -Ofast -march=znver2 -Rpass=loop-vectorize #-mllvm -force-vector-interleave=1
 default:
 	cc simple_kernel.c $(CFLAGS) -o kernel_ADD -DADD
 	cc simple_kernel.c $(CFLAGS) -o kernel_TMP -DTMP

@@ -46,11 +46,9 @@ struct timezone { int   tz_minuteswest;
 }
 
 int main() {
-    int ncores = 16;
     size_t cache_per4cores = 16E6;
     size_t array_size = 4 * cache_per4cores * 128/4;
 #ifdef SINGLE
-    ncores = 1;
     array_size = cache_per4cores * 4 * 4;  // memory inside one NUMA region is limited
 #endif
     int ntrials = 5;
