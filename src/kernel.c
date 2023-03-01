@@ -9,8 +9,18 @@
 /* STREAM TRAID kernel, 1 operation on 1 element, move 24 byte, do 2 FLOP */
 #define TRAID_BYTEPEROPS 12
 #define TRAID_NOPS(intensity) (round(intensity * TRAID_BYTEPEROPS))
+/* TMP kernel:
+    tmp = a[i] + b[i]
+    a[i] = tmp
+    b[i] = tmp
+    c[i] = tmp
+ * 1 FLOP, 3*8*2 Bytes
+ */
+#define TMP_BYTEPEROPS 48
+#define TMP_NOPS(intensity) (round(intensity * TMP_BYTEPEROPS))
 
-double *a[128], *b[128], *c[128];
+#define MAX_THREADNUM 128
+double *a[MAX_THREADNUM], *b[MAX_THREADNUM], *c[MAX_THREADNUM];
 int sizeperarray;
 
 /* Preprocess
@@ -39,8 +49,28 @@ void camp_preprocess(const Parameter *param) {
     }
 }
 
-/* operational intensity granularity: 1/12 */
+/* operational intensity granularity: 1/48 */
 static double camp_contig(const Parameter *param, float intensity, size_t stride_size) {
+    int nops = TMP_NOPS(intensity);
+    double starttime = TIMER();
+#pragma omp parallel default(none) shared(param, nops, a, b, c, stride_size, sizeperarray)
+    {
+        int tid = omp_get_thread_num();
+        for (size_t i = 0; i < sizeperarray; i += stride_size) {
+            for (int cnt = 0; cnt < nops; ++cnt) {
+                double tmp =  a[tid][i] + b[tid][i];
+                a[tid][i] = tmp;
+                b[tid][i] = tmp;
+                c[tid][i] = tmp;
+            }
+        }
+    }
+    return TIMER() - starttime;
+}
+
+
+/* operational intensity granularity: 1/12 */
+static double camp_contig_traid(const Parameter *param, float intensity, size_t stride_size) {
     int nops = TRAID_NOPS(intensity);
     double scalar = 3.0;
     double starttime = TIMER();
@@ -237,7 +267,7 @@ static double camp_random(const Parameter *param, float intensity) {
 void camp_kernel(const Parameter *param, double intensity, double *runtime, double *mb, double *mflop) {
     double memperarray = param->size * sizeof(double) * 1.0E-06;  /* MB */
     if (strcmp(param->kernel, "contig") == 0) {
-        *mb = memperarray * 3.0;
+        *mb = memperarray * 6.0;
         *mflop = *mb * intensity;
         *runtime = camp_contig(param, intensity, 1);
     } else if (strncmp(param->kernel, "stride", 6) == 0) {
