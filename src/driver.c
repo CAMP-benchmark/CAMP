@@ -54,7 +54,7 @@ void loop(const Parameter *param) {
             if (intensity_iter == 0 && min_runtime < 0.01)
                 printf("Warning: each thread run less than 0.01 second (%.4fs), "
                        "should increase <repeat> to get a resonable runtime\n", min_runtime);
-            write_record("%s, %11.2f, %9.2f,       %d, %9.2f, %10.6f, %15.4f, %15.4f,      %d, ",
+            write_record("%s, %11.2f, %9.2f,      %3d, %9.2f, %10.6f, %15.4f, %15.4f,    %3d, ",
                 param->kernel, mb * 1.0E6 / 1024 / 1024, mflop, nthreads, intensity,
                 min_runtime, mb / min_runtime, mflop / min_runtime, param->repeat);
             for (int repeat = 0; repeat < param->repeat; ++repeat) {

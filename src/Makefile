@@ -6,7 +6,7 @@ TARGET=$(strip $(ARCH))
 ifeq ($(TARGET), archer2-cray)
 CC=cc
 CPPFLAGS = 
-CFLAGS = -O2 -march=znver2 -Rpass=loop-vectorize -fopenmp #-fno-vectorize #-g
+CFLAGS = -O2 -march=znver2 -Rpass=loop-vectorize -fopenmp -mllvm -force-vector-interleave=8#-fno-vectorize #-g
 LDFLAGS = -fopenmp -fsanitize=address
 
 # assumes 

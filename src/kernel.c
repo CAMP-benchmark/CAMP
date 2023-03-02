@@ -5,18 +5,22 @@
 #include <time.h>
 #include <stdio.h>
 #include "util.h"
+#include "rep.h"
 
 /* STREAM TRAID kernel, 1 operation on 1 element, move 24 byte, do 2 FLOP */
 #define TRAID_BYTEPEROPS 12
 #define TRAID_NOPS(intensity) (round(intensity * TRAID_BYTEPEROPS))
 /* TMP kernel:
     tmp = a[i] + b[i]
-    a[i] = tmp
-    b[i] = tmp
-    c[i] = tmp
+    a[i] = -tmp
+    b[i] = -tmp
+    c[i] = -tmp
  * 1 FLOP, 3*8*2 Bytes
  */
-#define TMP_BYTEPEROPS 48
+// #define TMP_KERNEL(tmp, a, b, c) (tmp) = (a) + (b); (a) = (tmp); (b) = (tmp); (c) = (tmp)
+#define ADD_KERNEL(a, b, c) ((a) = (b) + (c))
+#define TRAID_KERNEL(a, b, c) ((a) = (a) * (b) + (c))
+#define TMP_BYTEPEROPS 50//48
 #define TMP_NOPS(intensity) (round(intensity * TMP_BYTEPEROPS))
 
 #define MAX_THREADNUM 128
@@ -52,16 +56,84 @@ void camp_preprocess(const Parameter *param) {
 /* operational intensity granularity: 1/48 */
 static double camp_contig(const Parameter *param, float intensity, size_t stride_size) {
     int nops = TMP_NOPS(intensity);
+    printf(" [nops is %d] ", nops);
     double starttime = TIMER();
 #pragma omp parallel default(none) shared(param, nops, a, b, c, stride_size, sizeperarray)
     {
+        double const_tmp = 1.0, alpha = 2.0;
         int tid = omp_get_thread_num();
-        for (size_t i = 0; i < sizeperarray; i += stride_size) {
-            for (int cnt = 0; cnt < nops; ++cnt) {
-                double tmp =  a[tid][i] + b[tid][i];
-                a[tid][i] = tmp;
-                b[tid][i] = tmp;
-                c[tid][i] = tmp;
+        if (nops == 1) {
+            for (size_t i = 0; i < sizeperarray; i += 1) {
+                double tmp = const_tmp;
+                ADD_KERNEL(tmp, a[tid][i], alpha);
+                a[tid][i] = -tmp;
+                b[tid][i] = -tmp;
+                c[tid][i] = -tmp;
+            }
+        } else if (nops == 2) {
+            for (size_t i = 0; i < sizeperarray; i += 1) {
+                double tmp = const_tmp;
+                TRAID_KERNEL(tmp, a[tid][i], alpha);
+                a[tid][i] = -tmp;
+                b[tid][i] = -tmp;
+                c[tid][i] = -tmp;
+            }
+        } else if (nops == 4) {
+            for (size_t i = 0; i < sizeperarray; i += 1) {
+                double tmp = const_tmp;
+                REP2(TRAID_KERNEL(tmp, a[tid][i], alpha));
+                a[tid][i] = -tmp;
+                b[tid][i] = -tmp;
+                c[tid][i] = -tmp;
+            }
+        } else if (nops == 8) {
+            for (size_t i = 0; i < sizeperarray; i += 1) {
+                double tmp = const_tmp;
+                REP4(TRAID_KERNEL(tmp, a[tid][i], alpha));
+                a[tid][i] = -tmp;
+                b[tid][i] = -tmp;
+                c[tid][i] = -tmp;
+            }
+        } else if (nops == 16) {
+            for (size_t i = 0; i < sizeperarray; i += 1) {
+                double tmp = const_tmp;
+                REP8(TRAID_KERNEL(tmp, a[tid][i], alpha));
+                a[tid][i] = -tmp;
+                b[tid][i] = -tmp;
+                c[tid][i] = -tmp;
+            }
+        } else if (nops == 32) {
+            for (size_t i = 0; i < sizeperarray; i += 1) {
+                double tmp = const_tmp;
+                REP16(TRAID_KERNEL(tmp, a[tid][i], alpha));
+                a[tid][i] = -tmp;
+                b[tid][i] = -tmp;
+                c[tid][i] = -tmp;
+            }
+        } else if (nops == 64) {
+            for (size_t i = 0; i < sizeperarray; i += 1) {
+                double tmp = const_tmp;
+                REP32(TRAID_KERNEL(tmp, a[tid][i], alpha));
+                a[tid][i] = -tmp;
+                b[tid][i] = -tmp;
+                c[tid][i] = -tmp;
+            }
+        } else if (nops == 128) {
+            for (size_t i = 0; i < sizeperarray; i += 1) {
+                double tmp = const_tmp;
+                REP64(TRAID_KERNEL(tmp, a[tid][i], alpha));
+                a[tid][i] = -tmp;
+                b[tid][i] = -tmp;
+                c[tid][i] = -tmp;
+            }
+        } else if (nops == 5) {
+            for (size_t i = 0; i < sizeperarray; i += 1) {
+                double tmp = const_tmp;
+                ADD_KERNEL(tmp, a[tid][i], alpha);
+                REP2(TRAID_KERNEL(tmp, a[tid][i], alpha));
+                a[tid][i] = -tmp;
+                b[tid][i] = -tmp;
+                c[tid][i] = -tmp;
             }
         }
     }
