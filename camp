@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+
+# Import builtin Python modules
+import sys,os.path
+
+# Import camp python modules
+from scripts.camp_core import camp_core
+from scripts.ert_utils import *
+
+# Get the path to the directory where this was run
+exe_path = os.path.dirname(sys.argv[0])
+if exe_path == "":
+  exe_path = "."
+
+# Create the camp object
+camp = camp_core(sys.argv[1])
+
+# Initialize the execution path
+camp.exe_path = exe_path
+
+# Configure the camp using the configuration file given on the command line
+if camp.configure() != 0:
+  sys.stderr.write("\n--- Configuring camp failed ---\n\n")
+  sys.exit(1)
+sys.stdout.flush()
+
+# Get the list of flops/element to try (specified by the user)
+flops_list = parse_int_list(camp.dict["CONFIG"]["FLOPS"][0])
+print(flops_list)
+
+# Go through the flops/element list and process each case
+for flop in flops_list:
+  # A bit of output if any verbosity has been requested
+  print("FLOP count %d..." % flop)
+  sys.stdout.flush()
+
+  # Set the camp object flops/element
+  camp.flop = flop
+
+  # Create a directory for these experiments (and give it to the camp object)
+  camp.flop_dir = "%s/FLOPS.%03d" % (camp.results_dir,flop)
+  make_dir_if_needed(camp.flop_dir,"run",True)
+
+  # Build the current code with the current flops/element
+  if camp.build() != 0:
+    sys.stderr.write("\n--- Building camp failed ---\n\n")
+    sys.exit(1)
+  sys.stdout.flush()
+"""
+  # Run the built code over a variety of MPI, OpenMP, and/or CUDA
+  # configurations specified by the user
+  if camp.run() != 0:
+    sys.stderr.write("\n--- Running camp failed ---\n\n")
+    sys.exit(1)
+  sys.stdout.flush()
+"""
+
+# All done
+sys.stdout.flush()
+sys.exit(0)
