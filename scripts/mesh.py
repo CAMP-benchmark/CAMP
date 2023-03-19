@@ -4,13 +4,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from pd_util import *
 
-def get_kernels_percent_mesh(df: pd.DataFrame):
-    """get percentage mesh for multiple kernels"""
-    kernel_dfs = get_sub_df("kernel", df)
-    for kernel in kernel_dfs:
-        get_percent_mesh(kernel_dfs[kernel], kernel)
 
-def get_percent_mesh(df: pd.DataFrame, pic_name: str):
+def get_mesh(df: pd.DataFrame, pic_name: str, percentage: bool = False):
     """get percentage mesh of same kernel"""
     OIs = get_elem_list("intensity", df)
     nthreads = get_elem_list("nthreads", df)
@@ -23,12 +18,13 @@ def get_percent_mesh(df: pd.DataFrame, pic_name: str):
     plot_data = np.flip(bandwidth, axis=0)  # upside down
 
     # percentage of max threads
-    for i,oi_line in enumerate(plot_data):
-        line_base = oi_line[-1]
-        for j,value in enumerate(oi_line):
-            plot_data[i][j] = plot_data[i][j] / line_base
+    if percentage:
+        for i,oi_line in enumerate(plot_data):
+            line_base = oi_line[-1]
+            for j,value in enumerate(oi_line):
+                plot_data[i][j] = plot_data[i][j] / line_base
 
-        fig = plt.figure()
+    fig = plt.figure()
 
     ax = fig.add_subplot(111)
     mycolors = 'Blues'
@@ -52,12 +48,14 @@ def get_percent_mesh(df: pd.DataFrame, pic_name: str):
                        ha="center", va="center", color="w", fontsize = 'x-small')
 
     # label axis
-    ypos =   [0,   3,   6,   9,   12,  15,  18,  21]
-    yvalue = [0.1, 0.7, 1.3, 1.9, 3.0, 4.5, 7.0, 10]
+    # ypos =   [0,   3,   6,   9,   12,  15,  18,  21]
+    # yvalue = [0.1, 0.7, 1.3, 1.9, 3.0, 4.5, 7.0, 10]
+    yvalue = OIs
     yvalue.reverse()
     # ax.set_yticks(xpos)
     # ax.set_yticklabels(xvalue)
     # ax.set_yticks(ypos, labels=yvalue)
+    ax.set_yticks(range(len(yvalue)), labels=yvalue)
     ax.set_xticks(range(len(nthreads)), labels=nthreads)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
          rotation_mode="anchor")
@@ -79,5 +77,13 @@ def get_percent_mesh(df: pd.DataFrame, pic_name: str):
     plt.savefig("{}.png".format(pic_name), dpi=300)
 
 
-filename = '../src/ERT_ugly_alpha.csv'
-get_kernels_percent_mesh(csv2df(filename))
+filename = '../src/ERT_ugly_1.csv'
+df = csv2df(filename)
+kernel_dfs = get_sub_df("kernel", df)
+for kernel in kernel_dfs:
+    get_mesh(df=kernel_dfs[kernel], pic_name=kernel+"_1", percentage=False)
+filename = '../src/ERT_ugly_2.csv'
+df = csv2df(filename)
+kernel_dfs = get_sub_df("kernel", df)
+for kernel in kernel_dfs:
+    get_mesh(df=kernel_dfs[kernel], pic_name=kernel+"_2", percentage=False)
