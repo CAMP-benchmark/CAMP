@@ -37,9 +37,6 @@ class camp_core:
             self.dict["CONFIG"][target] = value
 
     self.results_dir = self.dict["CONFIG"]["RESULTS"][0]
-    if os.path.exists(self.results_dir):
-      t = time.localtime()
-      self.results_dir += "_{}_{}".format(t.tm_hour,t.tm_min)
     made_results = make_dir_if_needed(self.results_dir,"results",False)
     self.result_csvname = "%s/result.csv" % (self.results_dir)
     

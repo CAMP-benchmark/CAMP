@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from scripts.camp_utils import *
+from camp_utils import *
 import sys
 
 
@@ -90,4 +90,4 @@ if __name__ == '__main__':
     df = csv2df(filename)
     kernel_dfs = get_sub_df("kernel", df)
     for kernel in kernel_dfs:
-        get_mesh(df=kernel_dfs[kernel], pic_name=filename.replace(".csv", "_"+kernel), percentage=False)
+        get_mesh(df=kernel_dfs[kernel], pic_name=filename.replace(".csv", "_"+kernel), percentage=True)
