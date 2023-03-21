@@ -19,4 +19,12 @@ export OMP_PROC_BIND=true
 # export PAT_RT_PERFCTR=CORE_TO_L2_CACHEABLE_REQUEST_ACCESS_STATUS:LS_RD_BLK_C,PAPI_L2_DCM,PAPI_FP_OPS,mem_bw
 
 
-srun --hint=nomultithread --unbuffered build/camp -s 1024000000 -r 3 -t 8,16,32,64,128 -i 0.02,0.04,0.1,0.32,1.28 -f ERT_ugly_2kernel.csv -k contig
+srun --hint=nomultithread --unbuffered build/camp -s 1024000000 -r 3 -t 8,16,32,64,128 -i 0.02,0.04,0.08,0.1,0.16,0.32,0.64,1.28,2.56 -f result_hardcode.csv -k contig
+
+# Load the Python module
+module load cray-python
+
+# If using a virtual environment
+source /work/ta094/ta094/wenqingpeng/pyenv-camp/bin/activate
+
+python ../scripts/mesh.py result_hardcode.csv
