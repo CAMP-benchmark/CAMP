@@ -1,0 +1,19 @@
+# test configure file
+
+# =========== compulsory =======================
+RESULTS archer2_1G_hardcode
+FLOPS 1,2,4,5,8,16,32,64,128
+OPENMP_THREADS 128,64,32,16,8
+MEM 1024000000
+
+# name of the kernel c source file
+KERNEL kernel_macro
+
+CC      cc
+CFLAGS  -O2 -march=znver2 -Rpass=loop-vectorize -fopenmp -mllvm -force-vector-interleave=8
+LD      cc
+LDFLAGS -fopenmp
+LDLIBS
+# =========== compulsory (end) =======================
+
+CAMP_RUN export OMP_NUM_THREADS=128;CAMP_EXE -k contig -s CAMP_MEM -r 3 -i CAMP_FLOP -t CAMP_NTHREADS -f CAMP_RESULT -d cyclic -l 128,64,16,4

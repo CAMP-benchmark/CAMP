@@ -5,7 +5,7 @@ import sys,os.path
 
 # Import camp python modules
 from scripts.camp_core import camp_core
-from scripts.ert_utils import *
+from scripts.camp_utils import *
 
 # Get the path to the directory where this was run
 exe_path = os.path.dirname(sys.argv[0])
@@ -13,7 +13,22 @@ if exe_path == "":
   exe_path = "."
 
 # Create the camp object
+if len(sys.argv) not in [2,3] :
+  sys.stderr.write("\n--- Too many/few arguments ---\n")
+  sys.stderr.write("        Usage: ./camp <CONFIG FILENAME> <option>\n")
+  sys.stderr.write("        <option>: build-only run-only plot-only \n")
+  sys.exit(1)
 camp = camp_core(sys.argv[1])
+
+# execute option
+if len(sys.argv) == 3:
+  build = (sys.argv[2] == "build-only")
+  run = (sys.argv[2] == "run-only")
+  plot = (sys.argv[2] == "plot-only")
+else:
+  build = True
+  run = True
+  plot = True
 
 # Initialize the execution path
 camp.exe_path = exe_path
@@ -26,7 +41,6 @@ sys.stdout.flush()
 
 # Get the list of flops/element to try (specified by the user)
 flops_list = parse_int_list(camp.dict["CONFIG"]["FLOPS"][0])
-print(flops_list)
 
 # Go through the flops/element list and process each case
 for flop in flops_list:
@@ -42,18 +56,20 @@ for flop in flops_list:
   make_dir_if_needed(camp.flop_dir,"run",True)
 
   # Build the current code with the current flops/element
-  if camp.build() != 0:
+  if build and camp.build() != 0:
     sys.stderr.write("\n--- Building camp failed ---\n\n")
     sys.exit(1)
   sys.stdout.flush()
-"""
+
   # Run the built code over a variety of MPI, OpenMP, and/or CUDA
   # configurations specified by the user
-  if camp.run() != 0:
+  if run and camp.run() != 0:
     sys.stderr.write("\n--- Running camp failed ---\n\n")
     sys.exit(1)
   sys.stdout.flush()
-"""
+
+if plot:
+  camp.plot()
 
 # All done
 sys.stdout.flush()

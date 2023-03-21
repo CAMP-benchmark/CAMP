@@ -27,8 +27,8 @@ int main(int argc, char *argv[]) {
     strcpy(namebuf, "contig");
     gettimetag(tag, MAXTAGLEN-sizeof(".csv"));
     strcat(tag, ".csv");
-    parse_seq(s_threads, "1, 2, +4:128:8");
-    parse_seq(s_intensity, "+0:1:0.1, +2:10:1");
+    parse_seq(s_threads, "1");
+    parse_seq(s_intensity, "0.1");
     parse_seq(s_hierarchy, "128, 64, 16, 8, 4");
 
     Parameter param = {

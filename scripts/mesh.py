@@ -2,17 +2,20 @@ import pandas as pd
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from pd_util import *
+from scripts.camp_utils import *
+import sys
 
 
 def get_mesh(df: pd.DataFrame, pic_name: str, percentage: bool = False):
     """get percentage mesh of same kernel"""
+    df.sort_values(by="intensity")
+    df.sort_values(by="nthreads")
     OIs = get_elem_list("intensity", df)
     nthreads = get_elem_list("nthreads", df)
     OI_dfs = get_sub_df("intensity", df)
     bandwidth = np.zeros(shape=(len(OIs), len(nthreads)))  # row is OI, column is nthreads
     for i, OI in enumerate(OI_dfs):
-        sub_df = OI_dfs[OI].sort_values(by="nthreads")
+        sub_df = OI_dfs[OI]
         bandwidth[i] = sub_df["bandwidth(MB/s)"].to_numpy()
 
     plot_data = np.flip(bandwidth, axis=0)  # upside down
@@ -75,15 +78,16 @@ def get_mesh(df: pd.DataFrame, pic_name: str, percentage: bool = False):
     plt.tight_layout()
     # plt.show()
     plt.savefig("{}.png".format(pic_name), dpi=300)
+    print("Mesh figure saved in {}.png".format(pic_name))
 
 
-filename = '../src/ERT_ugly_1.csv'
-df = csv2df(filename)
-kernel_dfs = get_sub_df("kernel", df)
-for kernel in kernel_dfs:
-    get_mesh(df=kernel_dfs[kernel], pic_name=kernel+"_1", percentage=False)
-filename = '../src/ERT_ugly_2.csv'
-df = csv2df(filename)
-kernel_dfs = get_sub_df("kernel", df)
-for kernel in kernel_dfs:
-    get_mesh(df=kernel_dfs[kernel], pic_name=kernel+"_2", percentage=False)
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        sys.stderr.write("\n--- need filename ---\n\n")
+        sys.exit(1)
+    sys.stdout.flush()
+    filename = sys.argv[1]
+    df = csv2df(filename)
+    kernel_dfs = get_sub_df("kernel", df)
+    for kernel in kernel_dfs:
+        get_mesh(df=kernel_dfs[kernel], pic_name=filename.replace(".csv", "_"+kernel), percentage=False)

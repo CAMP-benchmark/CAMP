@@ -115,3 +115,46 @@ def make_dir_if_needed(dir,name,echo=True):
     return False
 
   return True
+
+# Make a new file if it doesn't already exist
+def touch_file_if_needed(filename,tag,echo=True):
+  if not os.path.exists(filename):
+    command = ["touch",filename]
+    if execute_noshell(command,echo) != 0:
+      sys.stderr.write("Unable to touch %s file, %s\n" % (tag,filename))
+  else:
+    return False
+
+  return True
+
+import pandas as pd
+
+# csv title :'kernel, memory(MiB),     MFLOP, nthreads, intensity, runtime(s), bandwidth(MB/s),          mflops, repeat, raw_runtime(colon-seperated)'
+
+def csv2df(filename: str) -> pd.DataFrame:
+    """Get pandas.Dataframe from csv file"""
+    df = pd.read_csv(filename)
+    df.columns = df.columns.str.strip()
+    return df
+
+def get_elem_list(title: str, df_all: pd.DataFrame) -> list:
+    """Get list of elements in column named `title`"""
+    list = []
+    for index, row in df_all.iterrows():
+        elem = row[title]
+        if elem not in list:
+            list.append(elem)
+
+    return list
+    
+def get_sub_df(title: str, df_all: pd.DataFrame) -> dict:
+    """
+    Get sub DaraFrame with same value in `title` column
+    """
+    values = get_elem_list(title, df_all)
+    dfs = {}
+    for value in values:
+        dfs[value] = df_all.loc[df_all[title] == value]
+        dfs[value].reset_index(drop=True, inplace=True)
+    
+    return dfs
