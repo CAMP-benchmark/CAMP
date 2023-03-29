@@ -181,11 +181,14 @@ static double camp_contig_traid(const Parameter *param, float intensity, size_t 
     return TIMER() - starttime;
 }
 
+#define WRITE_BACK(a,b,c,tid,i,beta) a[tid][i] = -beta; b[tid][i] = -beta; c[tid][i] = -beta
+
 /*
  * we didn't put stencil in one function because we don't know how much it would affect performance
  * if we put branch statement inside loops. We try to keep the inner loop simple.
  */
-
+#define STENCIL5_ADD(a, tid, i, j, n, beta, alpha) ADD_KERNEL(beta, a[tid][i*n + j], alpha); ADD_KERNEL(beta, a[tid][i*n + j+1], alpha); ADD_KERNEL(beta, a[tid][i*n + j-1], alpha); ADD_KERNEL(beta, a[tid][(i+1)*n + j], alpha); ADD_KERNEL(beta, a[tid][(i-1)*n + j], alpha)
+#define STENCIL5_TRAID(a, tid, i, j, n, beta, alpha) TRAID_KERNEL(beta, a[tid][i*n + j], alpha); TRAID_KERNEL(beta, a[tid][i*n + j+1], alpha); TRAID_KERNEL(beta, a[tid][i*n + j-1], alpha); TRAID_KERNEL(beta, a[tid][(i+1)*n + j], alpha); TRAID_KERNEL(beta, a[tid][(i-1)*n + j], alpha)
 static double camp_stencil5(const Parameter *param, float intensity) {
     int nops = TRAID_NOPS(intensity);
     double scalar = 3.0;
@@ -193,27 +196,68 @@ static double camp_stencil5(const Parameter *param, float intensity) {
     double starttime = TIMER();
 #pragma omp parallel default(none) shared(param, nops, scalar, a, b, c, n, sizeperarray)
     {
+        double const_tmp = 1.0, alpha = 2.0;
         int tid = omp_get_thread_num();
         for (size_t i = 1; i < n - 1; ++i) {
             for (size_t j = 1; j < n - 1; ++j) {
-                for (int cnt = 0; cnt < nops; ++cnt) {
-                    a[tid][i*n + j] =
-                        b[tid][i*n + j] + c[tid][i*n + j] * scalar;
-                    a[tid][i*n + j+1] =
-                        b[tid][i*n + j+1] + c[tid][i*n + j+1] * scalar;
-                    a[tid][i*n + j-1] =
-                        b[tid][i*n + j-1] + c[tid][i*n + j-1] * scalar;
-                    a[tid][(i+1)*n + j] =
-                        b[tid][(i+1)*n + j] + c[tid][(i+1)*n + j] * scalar;
-                    a[tid][(i-1)*n + j] =
-                        b[tid][(i-1)*n + j] + c[tid][(i-1)*n + j] * scalar;
-                }
+                // for (int cnt = 0; cnt < nops; ++cnt) {
+                //     a[tid][i*n + j] =
+                //         b[tid][i*n + j] + c[tid][i*n + j] * scalar;
+                //     a[tid][i*n + j+1] =
+                //         b[tid][i*n + j+1] + c[tid][i*n + j+1] * scalar;
+                //     a[tid][i*n + j-1] =
+                //         b[tid][i*n + j-1] + c[tid][i*n + j-1] * scalar;
+                //     a[tid][(i+1)*n + j] =
+                //         b[tid][(i+1)*n + j] + c[tid][(i+1)*n + j] * scalar;
+                //     a[tid][(i-1)*n + j] =
+                //         b[tid][(i-1)*n + j] + c[tid][(i-1)*n + j] * scalar;
+                // }
+                double beta = const_tmp;
+#if (FLOP & 1) == 1 /* add 1 flop */
+    STENCIL5_ADD(a, tid, i, j, n, beta, alpha);
+#endif
+#if (FLOP & 2) == 2 /* add 2 flops */
+    STENCIL5_TRAID(a, tid, i, j, n, beta, alpha);
+#endif
+#if (FLOP & 4) == 4 /* add 4 flops */
+    REP2(STENCIL5_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 8) == 8 /* add 8 flops */
+    REP4(STENCIL5_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 16) == 16 /* add 16 flops */
+    REP8(STENCIL5_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 32) == 32 /* add 32 flops */
+    REP16(STENCIL5_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 64) == 64 /* add 64 flops */
+    REP32(STENCIL5_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 128) == 128 /* add 128 flops */
+    REP64(STENCIL5_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 256) == 256 /* add 256 flops */
+    REP128(STENCIL5_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 512) == 512 /* add 512 flops */
+    REP256(STENCIL5_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 1024) == 1024 /* add 1024 flops */
+    REP512(STENCIL5_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+                WRITE_BACK(a,b,c,tid,i*n + j,beta);
+                WRITE_BACK(a,b,c,tid,i*n + j+1,beta);
+                WRITE_BACK(a,b,c,tid,i*n + j-1,beta);
+                WRITE_BACK(a,b,c,tid,(i+1)*n + j,beta);
+                WRITE_BACK(a,b,c,tid,(i-1)*n + j,beta);
             }
         }
     }
     return TIMER() - starttime;
 }
-
+#define STENCIL9_ADD(a, tid, i, j, n, beta, alpha) ADD_KERNEL(beta, a[tid][i*n + j], alpha); ADD_KERNEL(beta, a[tid][i*n + j+1], alpha); ADD_KERNEL(beta, a[tid][i*n + j-1], alpha); ADD_KERNEL(beta, a[tid][(i+1)*n + j], alpha); ADD_KERNEL(beta, a[tid][(i-1)*n + j], alpha); ADD_KERNEL(beta, a[tid][(i+1)*n + j+1], alpha); ADD_KERNEL(beta, a[tid][(i+1)*n + j-1], alpha); ADD_KERNEL(beta, a[tid][(i-1)*n + j+1], alpha); ADD_KERNEL(beta, a[tid][(i-1)*n + j-1], alpha)
+#define STENCIL9_TRAID(a, tid, i, j, n, beta, alpha) TRAID_KERNEL(beta, a[tid][i*n + j], alpha); TRAID_KERNEL(beta, a[tid][i*n + j+1], alpha); TRAID_KERNEL(beta, a[tid][i*n + j-1], alpha); TRAID_KERNEL(beta, a[tid][(i+1)*n + j], alpha); TRAID_KERNEL(beta, a[tid][(i-1)*n + j], alpha); TRAID_KERNEL(beta, a[tid][(i+1)*n + j+1], alpha); TRAID_KERNEL(beta, a[tid][(i+1)*n + j-1], alpha); TRAID_KERNEL(beta, a[tid][(i-1)*n + j+1], alpha); TRAID_KERNEL(beta, a[tid][(i-1)*n + j-1], alpha)
 static double camp_stencil9(const Parameter *param, float intensity) {
     int nops = TRAID_NOPS(intensity);
     double scalar = 3.0;
@@ -221,34 +265,114 @@ static double camp_stencil9(const Parameter *param, float intensity) {
     double starttime = TIMER();
 #pragma omp parallel default(none) shared(param, nops, scalar, a, b, c, n, sizeperarray)
     {
+        double const_tmp = 1.0, alpha = 2.0;
         int tid = omp_get_thread_num();
         for (size_t i = 1; i < n - 1; ++i) {
             for (size_t j = 1; j < n - 1; ++j) {
-                for (int cnt = 0; cnt < nops; ++cnt) {
-                    a[tid][i*n + j] =
-                        b[tid][i*n + j] + c[tid][i*n + j] * scalar;
-                    a[tid][(i-1)*n + j-1] =
-                        b[tid][(i-1)*n + j-1] + c[tid][(i-1)*n + j-1] * scalar;
-                    a[tid][(i-1)*n + j] =
-                        b[tid][(i-1)*n + j] + c[tid][(i-1)*n + j] * scalar;
-                    a[tid][(i-1)*n + j+1] =
-                        b[tid][(i-1)*n + j+1] + c[tid][(i-1)*n + j+1] * scalar;
-                    a[tid][i*n + j-1] =
-                        b[tid][i*n + j-1] + c[tid][i*n + j-1] * scalar;
-                    a[tid][i*n + j+1] =
-                        b[tid][i*n + j+1] + c[tid][i*n + j+1] * scalar;
-                    a[tid][(i+1)*n + j-1] =
-                        b[tid][(i+1)*n + j-1] + c[tid][(i+1)*n + j-1] * scalar;
-                    a[tid][(i+1)*n + j] =
-                        b[tid][(i+1)*n + j] + c[tid][(i+1)*n + j] * scalar;
-                    a[tid][(i+1)*n + j+1] =
-                        b[tid][(i+1)*n + j+1] + c[tid][(i+1)*n + j+1] * scalar;
-                }
+                // for (int cnt = 0; cnt < nops; ++cnt) {
+                //     a[tid][i*n + j] =
+                //         b[tid][i*n + j] + c[tid][i*n + j] * scalar;
+                //     a[tid][(i-1)*n + j-1] =
+                //         b[tid][(i-1)*n + j-1] + c[tid][(i-1)*n + j-1] * scalar;
+                //     a[tid][(i-1)*n + j] =
+                //         b[tid][(i-1)*n + j] + c[tid][(i-1)*n + j] * scalar;
+                //     a[tid][(i-1)*n + j+1] =
+                //         b[tid][(i-1)*n + j+1] + c[tid][(i-1)*n + j+1] * scalar;
+                //     a[tid][i*n + j-1] =
+                //         b[tid][i*n + j-1] + c[tid][i*n + j-1] * scalar;
+                //     a[tid][i*n + j+1] =
+                //         b[tid][i*n + j+1] + c[tid][i*n + j+1] * scalar;
+                //     a[tid][(i+1)*n + j-1] =
+                //         b[tid][(i+1)*n + j-1] + c[tid][(i+1)*n + j-1] * scalar;
+                //     a[tid][(i+1)*n + j] =
+                //         b[tid][(i+1)*n + j] + c[tid][(i+1)*n + j] * scalar;
+                //     a[tid][(i+1)*n + j+1] =
+                //         b[tid][(i+1)*n + j+1] + c[tid][(i+1)*n + j+1] * scalar;
+                // }
+                double beta = const_tmp;
+#if (FLOP & 1) == 1 /* add 1 flop */
+    STENCIL9_ADD(a, tid, i, j, n, beta, alpha);
+#endif
+#if (FLOP & 2) == 2 /* add 2 flops */
+    STENCIL9_TRAID(a, tid, i, j, n, beta, alpha);
+#endif
+#if (FLOP & 4) == 4 /* add 4 flops */
+    REP2(STENCIL9_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 8) == 8 /* add 8 flops */
+    REP4(STENCIL9_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 16) == 16 /* add 16 flops */
+    REP8(STENCIL9_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 32) == 32 /* add 32 flops */
+    REP16(STENCIL9_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 64) == 64 /* add 64 flops */
+    REP32(STENCIL9_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 128) == 128 /* add 128 flops */
+    REP64(STENCIL9_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 256) == 256 /* add 256 flops */
+    REP128(STENCIL9_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 512) == 512 /* add 512 flops */
+    REP256(STENCIL9_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+#if (FLOP & 1024) == 1024 /* add 1024 flops */
+    REP512(STENCIL9_TRAID(a, tid, i, j, n, beta, alpha));
+#endif
+                WRITE_BACK(a,b,c,tid,i*n + j,beta);
+                WRITE_BACK(a,b,c,tid,i*n + j+1,beta);
+                WRITE_BACK(a,b,c,tid,i*n + j-1,beta);
+                WRITE_BACK(a,b,c,tid,(i+1)*n + j,beta);
+                WRITE_BACK(a,b,c,tid,(i-1)*n + j,beta);
+                WRITE_BACK(a,b,c,tid,(i+1)*n + j+1,beta);
+                WRITE_BACK(a,b,c,tid,(i+1)*n + j-1,beta);
+                WRITE_BACK(a,b,c,tid,(i-1)*n + j+1,beta);
+                WRITE_BACK(a,b,c,tid,(i-1)*n + j-1,beta);
             }
         }
     }
     return TIMER() - starttime;
 }
+
+// static double camp_stencil9(const Parameter *param, float intensity) {
+//     int nops = TRAID_NOPS(intensity);
+//     double scalar = 3.0;
+//     int n = (int)sqrt((double)sizeperarray);
+//     double starttime = TIMER();
+// #pragma omp parallel default(none) shared(param, nops, scalar, a, b, c, n, sizeperarray)
+//     {
+//         int tid = omp_get_thread_num();
+//         for (size_t i = 1; i < n - 1; ++i) {
+//             for (size_t j = 1; j < n - 1; ++j) {
+//                 for (int cnt = 0; cnt < nops; ++cnt) {
+//                     a[tid][i*n + j] =
+//                         b[tid][i*n + j] + c[tid][i*n + j] * scalar;
+//                     a[tid][(i-1)*n + j-1] =
+//                         b[tid][(i-1)*n + j-1] + c[tid][(i-1)*n + j-1] * scalar;
+//                     a[tid][(i-1)*n + j] =
+//                         b[tid][(i-1)*n + j] + c[tid][(i-1)*n + j] * scalar;
+//                     a[tid][(i-1)*n + j+1] =
+//                         b[tid][(i-1)*n + j+1] + c[tid][(i-1)*n + j+1] * scalar;
+//                     a[tid][i*n + j-1] =
+//                         b[tid][i*n + j-1] + c[tid][i*n + j-1] * scalar;
+//                     a[tid][i*n + j+1] =
+//                         b[tid][i*n + j+1] + c[tid][i*n + j+1] * scalar;
+//                     a[tid][(i+1)*n + j-1] =
+//                         b[tid][(i+1)*n + j-1] + c[tid][(i+1)*n + j-1] * scalar;
+//                     a[tid][(i+1)*n + j] =
+//                         b[tid][(i+1)*n + j] + c[tid][(i+1)*n + j] * scalar;
+//                     a[tid][(i+1)*n + j+1] =
+//                         b[tid][(i+1)*n + j+1] + c[tid][(i+1)*n + j+1] * scalar;
+//                 }
+//             }
+//         }
+//     }
+//     return TIMER() - starttime;
+// }
 
 static double camp_stencil7(const Parameter *param, float intensity) {
     int nops = TRAID_NOPS(intensity);
