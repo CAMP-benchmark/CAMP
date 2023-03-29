@@ -108,6 +108,61 @@ static double camp_contig(const Parameter *param, float intensity, size_t stride
     return TIMER() - starttime;
 }
 
+/* operational intensity granularity: 1/48 */
+static double camp_stride(const Parameter *param, float intensity, size_t stride_size) {
+    int nops = TMP_NOPS(intensity);
+    printf(" [nops is %d] ", FLOP);
+    double starttime = TIMER();
+#pragma omp parallel default(none) shared(param, nops, a, b, c, stride_size, sizeperarray)
+    {
+        double const_tmp = 1.0, alpha = 2.0;
+        int tid = omp_get_thread_num();
+        
+        for (size_t i = 0; i < sizeperarray; i += stride_size) {
+            double beta = const_tmp;
+            
+#if (FLOP & 1) == 1 /* add 1 flop */
+    ADD_KERNEL(beta, a[tid][i], alpha);
+#endif
+#if (FLOP & 2) == 2 /* add 2 flops */
+      TRAID_KERNEL(beta, a[tid][i], alpha);
+#endif
+#if (FLOP & 4) == 4 /* add 4 flops */
+      REP2(TRAID_KERNEL(beta, a[tid][i], alpha));
+#endif
+#if (FLOP & 8) == 8 /* add 8 flops */
+      REP4(TRAID_KERNEL(beta, a[tid][i], alpha));
+#endif
+#if (FLOP & 16) == 16 /* add 16 flops */
+      REP8(TRAID_KERNEL(beta, a[tid][i], alpha));
+#endif
+#if (FLOP & 32) == 32 /* add 32 flops */
+      REP16(TRAID_KERNEL(beta, a[tid][i], alpha));
+#endif
+#if (FLOP & 64) == 64 /* add 64 flops */
+      REP32(TRAID_KERNEL(beta, a[tid][i], alpha));
+#endif
+#if (FLOP & 128) == 128 /* add 128 flops */
+      REP64(TRAID_KERNEL(beta, a[tid][i], alpha));
+#endif
+#if (FLOP & 256) == 256 /* add 256 flops */
+      REP128(TRAID_KERNEL(beta, a[tid][i], alpha));
+#endif
+#if (FLOP & 512) == 512 /* add 512 flops */
+      REP256(TRAID_KERNEL(beta, a[tid][i], alpha));
+#endif
+#if (FLOP & 1024) == 1024 /* add 1024 flops */
+      REP512(TRAID_KERNEL(beta, a[tid][i], alpha));
+#endif
+
+            a[tid][i] = -beta;
+            b[tid][i] = -beta;
+            c[tid][i] = -beta;
+        }
+    }
+    return TIMER() - starttime;
+}
+
 
 /* operational intensity granularity: 1/12 */
 static double camp_contig_traid(const Parameter *param, float intensity, size_t stride_size) {
@@ -315,7 +370,7 @@ void camp_kernel(const Parameter *param, double intensity, double *runtime, doub
         size_t stride_size = atoi(param->kernel + 6);
         *mb = memperarray * 3.0 / stride_size;
         *mflop = *mb * intensity;
-        *runtime = camp_contig(param, intensity, stride_size);
+        *runtime = camp_stride(param, intensity, stride_size);
     } else if (strncmp(param->kernel, "stencil", 7) == 0) {
         if (strlen(param->kernel) < 8) { fprintf(stderr, "Please provide stencil cell size\n"); exit(-1); }
         size_t cell_size = atoi(param->kernel + 7);
