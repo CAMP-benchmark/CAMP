@@ -1,7 +1,7 @@
 # test configure file
 
 # result folder
-RESULTS example_result
+RESULTS macro_cyclic
 
 # ------- building -------
 CC      cc
@@ -15,20 +15,20 @@ KERNEL kernel_macro
 
 # ------- running -------
 # resources
-FLOPS 1,2,4,5
+FLOPS 1,2,4,5,8,10,12,14,16,20,25,32,40,50,64,80,128,256
 # known_issue: put larger number of thread first otherwise largest number thereads generate wrong results
-OPENMP_THREADS 32,24,16,8
-MEM 10240000
+OPENMP_THREADS 128,120,112,104,96,88,80,72,64,56,48,40,32,24,16,8
+MEM 1024000000
 
 REPEAT 3
 # access pattern
 PATTERN contig
 
 # thread placement (The easiest way to produce almost good placement is to use `spread` placement and let `HIERARCHY` be the total numer of cores)
-PlACEMENT spread
+PlACEMENT cyclic
 # core hierarchy inside node: list of number of cores in each hierarchy from node to die 
 # Information of hierarchy can be found with `$ lstopo`
-HIERARCHY 128
+HIERARCHY 128,64,16,8,4
 # allowed CPUS, only required for `cpu_bind` placement
 # CPUS
 
