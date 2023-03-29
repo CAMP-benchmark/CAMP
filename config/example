@@ -1,0 +1,41 @@
+# test configure file
+
+# result folder
+RESULTS example_result
+
+# ------- building -------
+CC      cc
+CFLAGS  -O2 -march=znver2 -Rpass=loop-vectorize -fopenmp -mllvm -force-vector-interleave=8
+LD      cc
+LDFLAGS -fopenmp
+LDLIBS
+
+# name of the kernel c source file
+KERNEL kernel_macro
+
+# ------- running -------
+# resources
+FLOPS 1,2,4,5
+# known_issue: put larger number of thread first otherwise largest number thereads generate wrong results
+OPENMP_THREADS 32,24,16,8
+MEM 10240000
+
+REPEAT 3
+# access pattern
+PATTERN contig
+
+# thread placement (The easiest way to produce almost good placement is to use `spread` placement and let `HIERARCHY` be the total numer of cores)
+PlACEMENT spread
+# core hierarchy inside node: list of number of cores in each hierarchy from node to die 
+# Information of hierarchy can be found with `$ lstopo`
+HIERARCHY 128
+# allowed CPUS, only required for `cpu_bind` placement
+# CPUS
+
+# strong or weak scaling (optional)
+# SCALING
+
+# legacy C interface, no need to change
+C_COMMAND CAMP_EXE -k CAMP_PATTERN -f CAMP_RESULT -t CAMP_NTHREADS -i CAMP_FLOP -s CAMP_MEM -r CAMP_REPEAT -d CAMP_PlACEMENT -l CAMP_HIERARCHY -c CAMP_CPUS CAMP_SCALING
+# command for launching each executable, you may want to set environment variable for instance
+CAMP_RUN C_COMMAND

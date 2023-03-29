@@ -2,14 +2,13 @@ import pandas as pd
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from camp_utils import *
+from scripts.camp_utils import *
 import sys
 
 
 def get_mesh(df: pd.DataFrame, pic_name: str, percentage: bool = False):
     """get percentage mesh of same kernel"""
-    df.sort_values(by="intensity")
-    df.sort_values(by="nthreads")
+    df = df.sort_values(by=["intensity", "nthreads"])
     OIs = get_elem_list("intensity", df)
     nthreads = get_elem_list("nthreads", df)
     OI_dfs = get_sub_df("intensity", df)

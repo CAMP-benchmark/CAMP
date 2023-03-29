@@ -39,6 +39,14 @@ class camp_core:
     self.results_dir = self.dict["CONFIG"]["RESULTS"][0]
     made_results = make_dir_if_needed(self.results_dir,"results",False)
     self.result_csvname = "%s/result.csv" % (self.results_dir)
+
+    # add default values
+    if "PlACEMENT" not in self.dict["CONFIG"] or len(self.dict["CONFIG"]["PlACEMENT"]) == 0:
+      self.dict["CONFIG"]["PlACEMENT"] = ["0"]
+    if "CPUS" not in self.dict["CONFIG"] or len(self.dict["CONFIG"]["CPUS"]) == 0:
+      self.dict["CONFIG"]["CPUS"] = ["0"]
+    if "SCALING" not in self.dict["CONFIG"] or len(self.dict["CONFIG"]["SCALING"]) == 0:
+      self.dict["CONFIG"]["SCALING"] = ["--strong"]
     
     return 0
 
@@ -83,12 +91,24 @@ class camp_core:
       result_csv.close()
       first = False
 
+    c_command = list_2_string(self.dict["CONFIG"]["C_COMMAND"])
     base_command = list_2_string(self.dict["CONFIG"]["CAMP_RUN"])
-    base_command = base_command.replace("CAMP_RESULT", self.result_csvname)
-    base_command = base_command.replace("CAMP_MEM", self.dict["CONFIG"]["MEM"][0])
+    base_command = base_command.replace("C_COMMAND", c_command)
     base_command = base_command.replace("CAMP_EXE", "%s/%s" % (self.flop_dir,self.dict["CONFIG"]["KERNEL"][0]))
+    base_command = base_command.replace("CAMP_PATTERN", self.dict["CONFIG"]["PATTERN"][0])
+    base_command = base_command.replace("CAMP_RESULT", self.result_csvname)
     base_command = base_command.replace("CAMP_NTHREADS", self.dict["CONFIG"]["OPENMP_THREADS"][0])
     base_command = base_command.replace("CAMP_FLOP", str(self.flop/48))
+    base_command = base_command.replace("CAMP_MEM", self.dict["CONFIG"]["MEM"][0])
+    base_command = base_command.replace("CAMP_REPEAT", self.dict["CONFIG"]["REPEAT"][0])
+    
+    
+    base_command = base_command.replace("CAMP_PlACEMENT", self.dict["CONFIG"]["PlACEMENT"][0])
+    base_command = base_command.replace("CAMP_HIERARCHY", self.dict["CONFIG"]["HIERARCHY"][0])
+    base_command = base_command.replace("CAMP_CPUS", self.dict["CONFIG"]["CPUS"][0])
+    base_command = base_command.replace("CAMP_SCALING", self.dict["CONFIG"]["SCALING"][0])
+
+
 
     if execute_shell(base_command) != 0:
       sys.stderr.write("Unable to complete %s, experiment\n" % (self.results_dir))

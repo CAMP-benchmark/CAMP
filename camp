@@ -43,30 +43,31 @@ sys.stdout.flush()
 flops_list = parse_int_list(camp.dict["CONFIG"]["FLOPS"][0])
 
 # Go through the flops/element list and process each case
-for flop in flops_list:
-  # A bit of output if any verbosity has been requested
-  print("FLOP count %d..." % flop)
-  sys.stdout.flush()
+if build or run:
+  for flop in flops_list:
+    # A bit of output if any verbosity has been requested
+    print("FLOP count %d..." % flop)
+    sys.stdout.flush()
 
-  # Set the camp object flops/element
-  camp.flop = flop
+    # Set the camp object flops/element
+    camp.flop = flop
 
-  # Create a directory for these experiments (and give it to the camp object)
-  camp.flop_dir = "%s/FLOPS.%03d" % (camp.results_dir,flop)
-  make_dir_if_needed(camp.flop_dir,"run",True)
+    # Create a directory for these experiments (and give it to the camp object)
+    camp.flop_dir = "%s/FLOPS.%03d" % (camp.results_dir,flop)
+    make_dir_if_needed(camp.flop_dir,"run",True)
 
-  # Build the current code with the current flops/element
-  if build and camp.build() != 0:
-    sys.stderr.write("\n--- Building camp failed ---\n\n")
-    sys.exit(1)
-  sys.stdout.flush()
+    # Build the current code with the current flops/element
+    if build and camp.build() != 0:
+      sys.stderr.write("\n--- Building camp failed ---\n\n")
+      sys.exit(1)
+    sys.stdout.flush()
 
-  # Run the built code over a variety of MPI, OpenMP, and/or CUDA
-  # configurations specified by the user
-  if run and camp.run() != 0:
-    sys.stderr.write("\n--- Running camp failed ---\n\n")
-    sys.exit(1)
-  sys.stdout.flush()
+    # Run the built code over a variety of MPI, OpenMP, and/or CUDA
+    # configurations specified by the user
+    if run and camp.run() != 0:
+      sys.stderr.write("\n--- Running camp failed ---\n\n")
+      sys.exit(1)
+    sys.stdout.flush()
 
 if plot:
   camp.plot()

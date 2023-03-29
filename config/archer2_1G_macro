@@ -1,0 +1,41 @@
+# test configure file
+
+# result folder
+RESULTS archer2_1G_macro
+
+# ------- building -------
+CC      cc
+CFLAGS  -O2 -march=znver2 -Rpass=loop-vectorize -fopenmp -mllvm -force-vector-interleave=8
+LD      cc
+LDFLAGS -fopenmp
+LDLIBS
+
+# name of the kernel c source file
+KERNEL kernel_macro
+
+# ------- running -------
+# resources
+FLOPS 1,2,4,5,8,10,12,14,16,20,25,32,40,50,64,80,128
+# known_issue: put larger number of thread first otherwise largest number thereads generate wrong results
+OPENMP_THREADS 128,120,112,104,96,88,80,72,64,56,48,40,32,24,16,8
+MEM 1024000000
+
+REPEAT 3
+# access pattern
+PATTERN contig
+
+# thread placement (optional)
+PlACEMENT cyclic
+# core hierarchy inside node: list of number of cores in each hierarchy from node to die 
+# Information of hierarchy can be found with `$ lstopo`
+HIERARCHY 128,64,16,4
+# allowed CPUS, required for `cpu_bind` placement
+CPUS
+
+# strong or weak scaling (optional)
+SCALING
+
+# legacy
+C_COMMAND CAMP_EXE -k CAMP_PATTERN -f CAMP_RESULT -t CAMP_NTHREADS -i CAMP_FLOP -s CAMP_MEM -r CAMP_REPEAT -d CAMP_PlACEMENT -l CAMP_HIERARCHY -c CAMP_CPUS CAMP_SCALING
+# add command for launching each executable if required in your system
+CAMP_RUN C_COMMAND

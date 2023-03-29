@@ -7,8 +7,44 @@ performance.
 ### Objectives
 CAMP is originally introduced in the hope of mimicing a real scientific computation program. CAMP would run on real machines and find the best configuration to launch the program, for example, placement and underpopulation configuration. However we found it difficult to develop a memory model that represent the memory behaviour of a real program. But we found this piece of code is helpful to observe the underpopulation effect for programs with different features, such as different patterns and operational intensity.
 
-
 ## Usage
+### Python
+Required Python packages can be found in `requirements.txt`. Code is tested in Python version `3.8.5` and packages version
+```
+numpy==1.24.2
+matplotlib==3.7.1
+pandas==1.5.3
+```
+You may would like to use `virtualenv` to manage Python packages by 
+```
+pip install --user virtualenv # if you don't have virtualenv
+mkdir /work/t01/t01/auser/<<name of your virtual environment>>  # Create the folder
+virtualenv -p /opt/cray/pe/python/3.8.5.0/bin/python /work/t01/t01/asuser/<<name of your virtual environment>>  # -p flag means use this python interpreter
+source /work/t01/t01/auser/<<name of your virtual environment>>/bin/activate
+pip install -r requirements.txt
+```
+
+### Configure
+Create a configure file in `config/` folder to specify details to build and run. See the sample for details. Each line in configure file is a key-value pair seperated by a space. Allowed values is listed in [legacy Usage](#allowed-value)
+
+### Execute CAMP
+```
+chmod +x ./camp
+./camp config_file [option]
+```
+| option | Usage |
+|-------|----------|
+| (default) | build,run,plot |
+| build-only | only build executables |
+| run-only | only run executables |
+| plot-only | only plot results |
+
+### Batch
+You may would like to execute `./camp` as above in a batch file. Samples of batch files can be found in `batch/` folder to submit jobs to a batch system.
+
+## Lagecy Usage
+Above usege is based on the improvement referenced to [Empirical Roofline Toolkit](https://crd.lbl.gov/divisions/amcr/computer-science-amcr/par/research/roofline/software/ert/). Please refer to the below instruction if you would like to use the lagency version. Lagecy version use loop to implement variable operational intensity instead of C macro and vectorization is off, people argue that this limits the usage of results.
+
 ### TL;DR
 ```c
 cd src
@@ -17,22 +53,22 @@ make
 build/camp <optional arguments>
 ```
 
-### Configurations
+### Configurations {#allowed-value}
 Parameters are input through command line arguments. Posible arguments are:
 
-| Name (`--<n>`) | Shortcut (`-<s>`) | Type     | Usage                       | Default          |
+| Name (`--<n>`) | Shortcut (`-<s>`) | Type     | Usage                       | Values(Default)          |
 | -------------- | ----------------- | -------- | --------------------------- | ---------------- |
-| kernel         | k                 | string   | name of kernel              | contig           |
-| filename       | f                 | string   | result filename             | <time>.csv       |
+| kernel         | k                 | string   | name of kernel              | contig(default),stride[n],stencil[5/9/7/13],random           |
+| filename       | f                 | string   | result filename             | .csv       |
 | threads        | t                 | Sequence | list of nthreads to test    | 1,2,+4:128:8     |
 | intensity      | i                 | Sequence | list of intensity to test   | +0:1:0.1,+2:10:1 |
 | size           | s                 | int      | array size                  | 16000000         |
 | repeat         | r                 | int      | num of times to run         | 3                |
-| distribution   | d                 | string   | threads affinity            | cyclic           |
+| distribution   | p                 | string   | threads placement            | cyclic(default),block,spread,none           |
 | strong         |                   |          | strong scaling              | default          |
 | weak           |                   |          | weak scaling                |                  |
 | cpus           | c                 | Sequence | allowed CPUs (for cpu-bind) |                  |
-| hierarchy      | l                 | Sequence | memory hierarchy            | 128,64,16,8,4    |
+| hierarchy      | l                 | Sequence | memory hierarchy (n cores in each hierarchy)            | 128,64,16,8,4    |
 | quiet          |                   |          | reduce log                  | false            |
 | help           |                   |          | print help                  |                  |
 
@@ -43,6 +79,17 @@ Sequence is a ourselves-define format: string literal can be parsed to a list of
 | "\<values\>"                    | "1,2"                | [1,2]                 |
 | "\<start>-\<end>"               | "3-5"                | [3,4,5]               |
 | <\* or +>\<start>:\<end>:\<increase>" | +0.1:0.5:0.2,*8:32:2 | [0.1,0.3,0.5,8,16,32] |
+
+Threads placement:
+| Option | Description |
+|----|----|
+| cyclic | From top hierarchy to lowest, at each level put next thread in next region cyclicly. Creating a `spread` flavor placement in each hierarchy. |
+| block | Fill a region in lowest hierarchy before moving to the next. |
+| spread | OpenMP `spread` |
+| cpu_bind | Explicitly set allowed CPUS |
+| none | do nothing |
+
+In fact, you may use `OMP_PLACES` and `OMP_PROC_BIND` to achieve the same effects, but tediously.
 
 An example:
 
