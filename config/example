@@ -1,7 +1,7 @@
 # test configure file
 
 # result folder
-RESULTS macro_cyclic_stencil5
+RESULTS example_result
 
 # ------- building -------
 CC      cc

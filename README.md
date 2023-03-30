@@ -9,7 +9,7 @@ CAMP is originally introduced in the hope of mimicing a real scientific computat
 
 ## Usage
 ### Python
-Required Python packages can be found in `requirements.txt`. Code is tested in Python version `3.8.5` and packages version
+Required Python packages can be found in `requirements.txt`. Code has been tested in Python version `3.8.5` and packages version
 ```
 numpy==1.24.2
 matplotlib==3.7.1
@@ -25,7 +25,7 @@ pip install -r requirements.txt
 ```
 
 ### Configure
-Create a configure file in `config/` folder to specify details to build and run. See the sample for details. Each line in configure file is a key-value pair seperated by a space. Allowed values is listed in [legacy Usage](#allowed-value)
+Create a configure file in `config/` folder to specify details to build and run. See the sample for details. Each line in configure file is a key-value pair seperated by a space. Allowed values is listed in [legacy Usage](#Configurations)
 
 ### Execute CAMP
 ```
@@ -40,45 +40,37 @@ chmod +x ./camp
 | plot-only | only plot results |
 
 ### Batch
-You may would like to execute `./camp` as above in a batch file. Samples of batch files can be found in `batch/` folder to submit jobs to a batch system.
+You may would like to perform the above `./camp` execution in a batch file. Sample batch files can be found in `batch/` folder to submit jobs to a batch system.
 
 ## Lagecy Usage
-Above usege is based on the improvement referenced to [Empirical Roofline Toolkit](https://crd.lbl.gov/divisions/amcr/computer-science-amcr/par/research/roofline/software/ert/). Please refer to the below instruction if you would like to use the lagency version. Lagecy version use loop to implement variable operational intensity instead of C macro and vectorization is off, people argue that this limits the usage of results.
+Above usege is based on the refactor ispired by [Empirical Roofline Toolkit](https://crd.lbl.gov/divisions/amcr/computer-science-amcr/par/research/roofline/software/ert/). Please refer to the below instruction if you would like to use the lagency version. Lagecy version use loop to implement variable operational intensity instead of C macro and vectorization is off, people argue that this limits the usage of results.
 
 ### TL;DR
-```c
+```shell
 cd src
 mkdir build
-make
+ARCH=<target_architecture(see `make usage`)> make
 build/camp <optional arguments>
 ```
 
-### Configurations {#allowed-value}
+### Configurations
 Parameters are input through command line arguments. Posible arguments are:
 
 | Name (`--<n>`) | Shortcut (`-<s>`) | Type     | Usage                       | Values(Default)          |
 | -------------- | ----------------- | -------- | --------------------------- | ---------------- |
-| kernel         | k                 | string   | name of kernel              | contig(default),stride[n],stencil[5/9/7/13],random           |
+| kernel         | k                 | string   | name of kernel              | contig(default),stride<n>,stencil<5/9/7/13>,random           |
 | filename       | f                 | string   | result filename             | .csv       |
 | threads        | t                 | Sequence | list of nthreads to test    | 1,2,+4:128:8     |
 | intensity      | i                 | Sequence | list of intensity to test   | +0:1:0.1,+2:10:1 |
 | size           | s                 | int      | array size                  | 16000000         |
 | repeat         | r                 | int      | num of times to run         | 3                |
-| distribution   | p                 | string   | threads placement            | cyclic(default),block,spread,none           |
+| distribution   | d                 | string   | threads placement            | cyclic(default),block,spread,none           |
 | strong         |                   |          | strong scaling              | default          |
 | weak           |                   |          | weak scaling                |                  |
 | cpus           | c                 | Sequence | allowed CPUs (for cpu-bind) |                  |
 | hierarchy      | l                 | Sequence | memory hierarchy (n cores in each hierarchy)            | 128,64,16,8,4    |
 | quiet          |                   |          | reduce log                  | false            |
 | help           |                   |          | print help                  |                  |
-
-Sequence is a ourselves-define format: string literal can be parsed to a list of number:
-
-| String format                 | Example              | Parsed list           |
-| ----------------------------- | -------------------- | --------------------- |
-| "\<values\>"                    | "1,2"                | [1,2]                 |
-| "\<start>-\<end>"               | "3-5"                | [3,4,5]               |
-| <\* or +>\<start>:\<end>:\<increase>" | +0.1:0.5:0.2,*8:32:2 | [0.1,0.3,0.5,8,16,32] |
 
 Threads placement:
 | Option | Description |
@@ -90,6 +82,14 @@ Threads placement:
 | none | do nothing |
 
 In fact, you may use `OMP_PLACES` and `OMP_PROC_BIND` to achieve the same effects, but tediously.
+
+Sequence is a ourselves-define format: string literal can be parsed to a list of number:
+
+| String format                 | Example              | Parsed list           |
+| ----------------------------- | -------------------- | --------------------- |
+| "\<values\>"                    | "1,2"                | [1,2]                 |
+| "\<start>-\<end>"               | "3-5"                | [3,4,5]               |
+| <\* or +>\<start>:\<end>:\<increase>" | +0.1:0.5:0.2,*8:32:2 | [0.1,0.3,0.5,8,16,32] |
 
 An example:
 
