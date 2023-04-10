@@ -23,7 +23,9 @@
 #define TMP_BYTEPEROPS 48
 #define TMP_NOPS(intensity) (round(intensity * TMP_BYTEPEROPS))
 
+#ifndef MAX_THREADNUM
 #define MAX_THREADNUM 128
+#endif
 extern double *a[MAX_THREADNUM], *b[MAX_THREADNUM], *c[MAX_THREADNUM];
 int sizeperarray;
 

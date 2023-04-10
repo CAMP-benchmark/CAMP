@@ -53,11 +53,15 @@ class camp_core:
   def build(self):
     print("  Building CAMP core code...")
 
+    threads_list = parse_int_list(self.dict["CONFIG"]["OPENMP_THREADS"][0])
+    max_threadnum = max(threads_list)
+
     command_prefix =                                                       \
       self.dict["CONFIG"]["CC"]                                                + \
       self.dict["CONFIG"]["CFLAGS"]                                            + \
       ["-I%s/src" % self.exe_path]                                   + \
-      ["-DFLOP=%d" % self.flop]
+      ["-DFLOP=%d" % self.flop] + \
+      ["-DMAX_THREADNUM=%d" % max_threadnum]
 
     targets = ["main","util","py_driver","array"]
     targets.append(self.dict["CONFIG"]["KERNEL"][0])
