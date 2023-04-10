@@ -24,6 +24,7 @@ export OMP_PROC_BIND=true
 # export PAT_RT_SUMMARY=0
 # export PAT_RT_PERFCTR=CORE_TO_L2_CACHEABLE_REQUEST_ACCESS_STATUS:LS_RD_BLK_C,PAPI_L2_DCM,PAPI_FP_OPS,mem_bw
 
+./camp tagged_batch/$CONFIG build-only
 
 # --cpu-freq=2250000
-srun --hint=nomultithread --unbuffered ./camp config/example_1
+srun --hint=nomultithread --unbuffered ./camp tagged_batch/$CONFIG run-only

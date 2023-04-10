@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+# known issue: same FLOP can NOT be batched, maybe because use same exeutable?
+
+from scripts.camp_utils import *
+import matplotlib
+import matplotlib.pyplot as plt
+import re
+import csv 
+import time
+
+# -------------- parameter -----------------
+
+config_tamplate = "config/example_tamplate"
+config_tag_tamplate = "tagged_batch/example_{}"
+# config_batch = "config/example_1"
+batch_tamplate = "batch/archer2_tamplate.slurm"
+batch_tag_tamplate = "tagged_batch/archer2_{}.slurm"
+result_filename = "rst_energy.csv"
+pic_name = "rst_energy"
+
+# [[flop, nthread], ...]
+# config_list = [[1,128],[2,128]]
+config_list = []
+for flop in [1,2,4,5,8,10,12,14,16,20,25,32,40,50,64,80,128]:
+    config_list.append([flop,128])
+
+# -------------- end -----------------
+
+def execute():
+    make_dir_if_needed("tagged_batch","tagged_batch",echo=True)
+    with open(result_filename, 'w', encoding='UTF8', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(["flop", "nthread", "jobid", "energy(J)"])
+        for config in config_list:
+            tag = "{}_{}".format(config[0], config[1])
+            config_tag = config_tag_tamplate.format(tag)
+            replace_cmd = "sed -e 's/$FLOP/{}/g' -e 's/$OPENMP_THREAD/{}/g' {} > {}".format(config[0], config[1], config_tamplate, config_tag)
+            if execute_shell(replace_cmd, echo=True) != 0:
+                sys.stderr.write("Replace tamplate failed\n")
+                return 1
+            batch_tag = batch_tag_tamplate.format(tag)
+            replace_cmd = "sed 's/$CONFIG/{}/g' {} > {}".format("example_{}".format(tag), batch_tamplate, batch_tag)
+            if execute_shell(replace_cmd, echo=True) != 0:
+                sys.stderr.write("Replace tamplate failed\n")
+                return 1
+            
+            submit_cmd = "sbatch {} | grep -Po -m1 '\\d+'".format(batch_tag)
+            # submit_cmd = "echo 'Submitted batch job 3391917' | grep -Po -m1 '\\d+'"
+            retcode, retval = stdout_shell(submit_cmd, echo=True)
+            config.append(retval.strip('\n'))
+            writer.writerow(config)
+            # time.sleep(10)
+
+def extract():
+    with open(result_filename, 'r', encoding='UTF8', newline='') as f:
+        reader = csv.reader(f)
+        next(reader, None)
+        config_list = []
+        for row in reader:
+            config_list.append(row)
+        print(config_list)
+
+    with open(result_filename, 'w', encoding='UTF8', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(["flop", "nthread", "jobid", "energy(J)"])
+        for config in config_list:
+            jobid = config[2]
+            query_cmd = "sacct -j {} --format=ConsumedEnergyRaw | grep -Po -m1 '\\d+'".format(jobid)
+            retcode, retval = stdout_shell(query_cmd, echo=True)
+            config.append(retval.strip('\n'))
+            writer.writerow(config)
+
+def plot():
+    df = csv2df(result_filename)
+    df = df.sort_values(by=["flop", "nthread"])
+    OIs = get_elem_list("flop", df)
+    energy_list = get_elem_list("energy(J)", df)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(range(len(OIs)),energy_list,marker = 'o')
+    ax.set_aspect('auto')
+    ax.set_xticks(range(len(OIs)), labels=OIs)
+
+    plt.xlabel("Operational intensity")
+    plt.ylabel("Energy (J)")
+    plt.ylim([0, 10000])
+
+    # plt.show()
+    plt.savefig("{}.png".format(pic_name), dpi=300)
+        
+
+# execute()
+# print(config_list)
+# extract()
+plot()
