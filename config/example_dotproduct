@@ -1,7 +1,7 @@
 #test configure file
 
 # result folder
-RESULTS macro_cyclic_dotproduct_long
+RESULTS rst_macro_cyclic_dotproduct
 
 # ------- building -------
 CC      cc

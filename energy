@@ -10,10 +10,10 @@ import time
 
 # -------------- parameter -----------------
 
-config_tamplate = "config/example_tamplate"
+config_tamplate = "config/example_tag_tamplate"
 config_tag_tamplate = "tagged_batch/example_{}"
 # config_batch = "config/example_1"
-batch_tamplate = "batch/archer2_tamplate.slurm"
+batch_tamplate = "batch/archer2_tag_tamplate.slurm"
 batch_tag_tamplate = "tagged_batch/archer2_{}.slurm"
 result_filename = "rst_energy.csv"
 pic_name = "rst_energy"
