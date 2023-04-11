@@ -26,4 +26,4 @@ export OMP_PROC_BIND=true
 
 
 # --cpu-freq=2250000
-srun --hint=nomultithread --unbuffered ./camp config/example_1
+srun --hint=nomultithread --unbuffered ./camp config/example

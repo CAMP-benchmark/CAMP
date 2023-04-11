@@ -18,11 +18,15 @@ batch_tag_tamplate = "tagged_batch/archer2_{}.slurm"
 result_filename = "rst_energy.csv"
 pic_name = "rst_energy"
 
+best_ntrd_list = [16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 32, 32, 56, 56, 80, 128, 128]
+flops = [1,2,4,5,8,10,12,14,16,20,25,32,40,50,64,80,128]
+
 # [[flop, nthread], ...]
 # config_list = [[1,128],[2,128]]
 config_list = []
-for flop in [1,2,4,5,8,10,12,14,16,20,25,32,40,50,64,80,128]:
-    config_list.append([flop,128])
+for idx in range(len(flops)):
+    # config_list.append([flops[idx], best_ntrd_list[idx]])
+    config_list.append([flops[idx], 128])
 
 # -------------- end -----------------
 
@@ -71,26 +75,46 @@ def extract():
             writer.writerow(config)
 
 def plot():
-    df = csv2df(result_filename)
+    df = csv2df("rst_energy_full.csv")
     df = df.sort_values(by=["flop", "nthread"])
-    OIs = get_elem_list("flop", df)
-    energy_list = get_elem_list("energy(J)", df)
+    flops = get_elem_list("flop", df)
+    OIs = ["{:.2f}".format(flop/48) for flop in flops]
+    energy_list_full = get_elem_list("energy(J)", df)
+
+    df = csv2df("rst_energy_best.csv")
+    df = df.sort_values(by=["flop", "nthread"])
+    flops = get_elem_list("flop", df)
+    OIs = ["{:.2f}".format(flop/48) for flop in flops]
+    energy_list_best = get_elem_list("energy(J)", df)
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.plot(range(len(OIs)),energy_list,marker = 'o')
-    ax.set_aspect('auto')
+    ax.plot(range(len(OIs)),energy_list_full,marker = 'o',color='r', label="Full")
+    ax.plot(range(len(OIs)),energy_list_best,marker = 'o',color='b', label="Underpopulate")
+
+    ax.legend()
     ax.set_xticks(range(len(OIs)), labels=OIs)
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
 
     plt.xlabel("Operational intensity")
     plt.ylabel("Energy (J)")
     plt.ylim([0, 10000])
 
+    # ax.set_aspect('auto')
+    plt.tight_layout()
     # plt.show()
     plt.savefig("{}.png".format(pic_name), dpi=300)
         
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        sys.stderr.write("\n--- need command ---\n\n")
+        sys.exit(1)
+    sys.stdout.flush()
+    command = sys.argv[1]
 
-# execute()
-# print(config_list)
-# extract()
-plot()
+    if command == "execute":
+        execute()
+    if command == "extract":
+        extract()
+    if command == "plot":
+        plot()

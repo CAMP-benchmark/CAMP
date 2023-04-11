@@ -8,6 +8,7 @@ import sys
 
 def get_mesh(df: pd.DataFrame, pic_name: str, percentage: bool = False):
     """get percentage mesh of same kernel"""
+    best_thread_list = []
     df = df.sort_values(by=["intensity", "nthreads"])
     OIs = get_elem_list("intensity", df)
     nthreads = get_elem_list("nthreads", df)
@@ -16,6 +17,11 @@ def get_mesh(df: pd.DataFrame, pic_name: str, percentage: bool = False):
     for i, OI in enumerate(OI_dfs):
         sub_df = OI_dfs[OI]
         bandwidth[i] = sub_df["bandwidth(MB/s)"].to_numpy()
+        max_idx = np.argmax(bandwidth[i])
+        best_thread_list.append(nthreads[max_idx])
+
+    print("OIs: ", OIs)
+    print("best ntrd: ", best_thread_list)
 
     plot_data = np.flip(bandwidth, axis=0)  # upside down
 

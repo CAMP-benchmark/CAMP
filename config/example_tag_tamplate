@@ -1,7 +1,7 @@
 #test configure file
 
 # result folder
-RESULTS rst_macro_cyclic_contig
+RESULTS rst_macro_cyclic_contig_energy
 
 # ------- building -------
 CC      cc
@@ -39,6 +39,6 @@ HIERARCHY 128,64,16,8,4
 # SCALING
 
 # legacy C interface, no need to change
-C_COMMAND CAMP_EXE -k CAMP_PATTERN -f CAMP_RESULT -t CAMP_NTHREADS -i CAMP_FLOP -s CAMP_MEM -r CAMP_REPEAT -d CAMP_PlACEMENT -l CAMP_HIERARCHY -c CAMP_CPUS CAMP_SCALING
+C_COMMAND CAMP_EXE -k CAMP_PATTERN -f CAMP_RESULT -t CAMP_NTHREADS -i CAMP_OI -s CAMP_MEM -r CAMP_REPEAT -d CAMP_PlACEMENT -l CAMP_HIERARCHY -c CAMP_CPUS CAMP_SCALING
 # command for launching each executable, you may want to set environment variable for instance
 CAMP_RUN C_COMMAND

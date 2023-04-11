@@ -12,6 +12,7 @@ class camp_core:
   def __init__(self, config_filename):
     self.dict = {}
     self.configure_filename = config_filename
+    self.byte_per_OP = 48
 
   def configure(self):
     print("Reading configuration from '%s'..." % self.configure_filename)
@@ -102,7 +103,7 @@ class camp_core:
     base_command = base_command.replace("CAMP_PATTERN", self.dict["CONFIG"]["PATTERN"][0])
     base_command = base_command.replace("CAMP_RESULT", self.result_csvname)
     base_command = base_command.replace("CAMP_NTHREADS", self.dict["CONFIG"]["OPENMP_THREADS"][0])
-    base_command = base_command.replace("CAMP_FLOP", str(self.flop/48))
+    base_command = base_command.replace("CAMP_OI", str(self.flop/self.byte_per_OP))
     base_command = base_command.replace("CAMP_MEM", self.dict["CONFIG"]["MEM"][0])
     base_command = base_command.replace("CAMP_REPEAT", self.dict["CONFIG"]["REPEAT"][0])
     
