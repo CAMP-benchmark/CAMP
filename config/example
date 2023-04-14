@@ -1,6 +1,7 @@
 # test configure file
 
-# result folder
+# result folder, where results are dumped
+# You may like to specify a new folder for each run
 RESULTS rst_macro_cyclic_contig_10
 
 # ------- building -------

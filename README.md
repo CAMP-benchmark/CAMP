@@ -25,7 +25,7 @@ pip install -r requirements.txt
 ```
 
 ### Configure
-Create a configure file in `config/` folder to specify details to build and run. See the sample for details. Each line in configure file is a key-value pair seperated by a space. Allowed values is listed in [legacy Usage](#Configurations)
+Create a configure file in `config/` folder to specify details to build and run. See the sample for details. Some options have significant effect on performance, such as `HIERARCHY`. Each line in configure file is a key-value pair seperated by a space. Allowed values is listed in [legacy Usage](#Configurations)
 
 ### Execute CAMP
 ```
