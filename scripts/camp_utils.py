@@ -137,13 +137,13 @@ def csv2df(filename: str) -> pd.DataFrame:
     df.columns = df.columns.str.strip()
     return df
 
-def get_elem_list(title: str, df_all: pd.DataFrame) -> list:
+def get_elem_list(title: str, df_all: pd.DataFrame, repeat=False) -> list:
     """Get list of elements in column named `title`"""
     list = []
     for index, row in df_all.iterrows():
         elem = row[title]
-        if elem not in list:
-            list.append(elem)
+        if repeat or elem not in list:
+          list.append(elem)
 
     return list
     

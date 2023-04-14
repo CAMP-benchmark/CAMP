@@ -44,7 +44,7 @@ static double camp_dotproduct(const Parameter *param) {
     {
         int tid = omp_get_thread_num();
         for (size_t i = 0; i < sizeperarray; i += 1) {
-            sum += a[tid][i];
+            sum += a[tid][i] * b[tid][i];
         }
     }
     c[0][0] = sum;

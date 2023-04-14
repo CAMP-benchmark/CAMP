@@ -12,6 +12,8 @@
 #SBATCH --partition=standard
 #SBATCH --qos=standard
 
+#SBATCH --output=tagged_batch/slurm-%j.out
+
 # Load the Python module
 module load cray-python
 
@@ -27,4 +29,4 @@ export OMP_PROC_BIND=true
 ./camp tagged_batch/$CONFIG build-only
 
 # --cpu-freq=2250000
-srun --hint=nomultithread --unbuffered ./camp tagged_batch/$CONFIG run-only
+srun --cpu-freq=$FREQUENCY --hint=nomultithread --unbuffered ./camp tagged_batch/$CONFIG run-only
