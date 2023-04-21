@@ -99,17 +99,17 @@ def extract(result_filename: str):
 def plot(result_filename_full: str, result_filename_best: str):
     df = csv2df(result_filename_full)
     df = df.sort_values(by=["flop", "nthread"])
-    flops = get_elem_list("flop", df, repeat=True)
+    flops = get_elem_list("flop", df)
     OIs = ["{:.2f}".format(flop/48) for flop in flops]
-    energy_list_full = get_elem_list("energy(J)", df)
+    energy_list_full = get_elem_list("energy(J)", df, repeat=True)
     # print(len(energy_list_full))
 
     df = csv2df(result_filename_best)
     df = df.sort_values(by=["flop", "nthread"])
-    flops = get_elem_list("flop", df, repeat=True)
+    flops = get_elem_list("flop", df)
     OIs = ["{:.2f}".format(flop/48) for flop in flops]
     # print("len(IO ", len(OIs))
-    energy_list_best = get_elem_list("energy(J)", df)
+    energy_list_best = get_elem_list("energy(J)", df, repeat=True)
     # print("df.size ",df.shape)
     # print(len(energy_list_best))
 
@@ -118,7 +118,7 @@ def plot(result_filename_full: str, result_filename_best: str):
     # print(range(len(OIs)))
     # print(energy_list_full)
     # print(energy_list_best)
-    ax.plot(range(len(OIs)),energy_list_full,marker = 'o',color='r', label="Fullypopulate")
+    ax.plot(range(len(OIs)),energy_list_full,marker = 'o',color='r', label="Full")
     ax.plot(range(len(OIs)),energy_list_best,marker = 'o',color='b', label="Underpopulate")
 
     ax.legend()
@@ -128,6 +128,7 @@ def plot(result_filename_full: str, result_filename_best: str):
     plt.xlabel("Operational intensity")
     plt.ylabel("Energy (J)")
     # plt.ylim([0, 10000])
+    ax.set_ylim(bottom=0)
 
     # ax.set_aspect('auto')
     plt.tight_layout()
@@ -155,7 +156,7 @@ if __name__ == '__main__':
         execute(config_list_best, result_filename_best)
         execute(config_list_full, result_filename_full)
     if command == "extract":
-        extract(result_filename_best)
-        extract(result_filename_full)
+        # extract(result_filename_best)
+        # extract(result_filename_full)
 
         plot(result_filename_full, result_filename_best)

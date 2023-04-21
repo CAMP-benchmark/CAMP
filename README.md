@@ -48,10 +48,19 @@ A script is provided to analysis the energy consumption. We compare the energy b
 After completing above experiments, you would find a file named `<result folder>/result.csv` which contains bandwidth data. The scripts gather these data and re-run by submit as seperated Slurm job so that we can collect energy data with `sacct`. One would also collect energy analysis using different CPU frequency.
  
 ```
-./energy <result.csv> <frequency> <option: run/extract/plot>
+./energy <result.csv> <frequency> <option: run/extract>
 ```
 
 To use this script, you shall first submit jobs to Slurm by e.g., `./energy rst_macro_cyclic_contig_10/result.csv 2250000 run`. Once all jobs are finished, `./energy rst_macro_cyclic_contig_10 2250000 extract` to collect energy data from Slurm and plot.
+
+## Plot
+
+We also provides plot scripts which we use to generte figures. Usage are below, note that you shall check the scripts since some variable are hard-coded.
+
+- `boxplot.py`, show deviation of result.csv: `python boxplot.py <result.csv>`
+- `line.py`, line plot of result:`python line.py <result.csv>`
+- `value_best.py`, best underpopulation result compare with fullypopulated.
+- `energy_boxplot.py`, show deviation of energy consumption collection: `python energy_boxplot.py <CPU frequency> <command: run/execution>`
 
 ## Lagecy Usage
 Above usege is based on the refactor ispired by [Empirical Roofline Toolkit](https://crd.lbl.gov/divisions/amcr/computer-science-amcr/par/research/roofline/software/ert/). Please refer to the below instruction if you would like to use the lagency version. Lagecy version use loop to implement variable operational intensity instead of C macro and vectorization is off, people argue that this limits the usage of results.
