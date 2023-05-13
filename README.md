@@ -51,7 +51,7 @@ After completing above experiments, you would find a file named `<result folder>
 ./energy <result.csv> <frequency> <option: run/extract>
 ```
 
-To use this script, you shall first submit jobs to Slurm by e.g., `./energy rst_macro_cyclic_contig_10/result.csv 2250000 run`. Once all jobs are finished, `./energy rst_macro_cyclic_contig_10 2250000 extract` to collect energy data from Slurm and plot.
+To use this script, you shall first submit jobs to Slurm by e.g., `./energy rst_macro_cyclic_contig_10/result.csv 2250000 run`. Once all jobs are finished, `./energy rst_macro_cyclic_contig_10/result.csv 2250000 extract` to collect energy data from Slurm and plot.
 
 ## Plot
 
